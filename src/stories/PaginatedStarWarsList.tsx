@@ -33,7 +33,7 @@ const { AdhocList, AdhocListColumn } = makeAdhocList<
 
 const getDataObservable = (params: { size: number; page: number }) =>
   ajaxGetJSON<StarWarsPersonSearch>(
-    `https://swapi.dev/api/people?search=&page=${params.page}`
+    `https://swapi.py4e.com/api/people?search=&page=${params.page}`
   ).pipe(
     map((d) => ({
       total: d.count,
