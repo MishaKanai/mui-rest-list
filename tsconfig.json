@@ -1,16 +1,14 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": false,
     "skipLibCheck": true,
+    "sourceMap": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
+    "declaration": true,
     "forceConsistentCasingInFileNames": true,
     "module": "esnext",
     "moduleResolution": "node",
@@ -18,8 +16,5 @@
     "isolatedModules": true,
     "jsx": "react"
   },
-  "include": [
-    "src/**/*",
-    ".storybook/**/*"
-  ]
+  "include": ["src/**/*", ".storybook/**/*"]
 }
