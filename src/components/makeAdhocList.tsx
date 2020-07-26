@@ -98,54 +98,60 @@ const HiddenAriaLive = <T extends any>(props: {
   );
 };
 
+export interface AdHocColumnProps1<
+  DataShape,
+  FieldKey1 extends keyof DataShape
+> {
+  title: string;
+  hideColTitle?: boolean;
+  fieldKey: FieldKey1;
+  renderdata?: (
+    fieldData: DataShape[FieldKey1],
+    rowData: DataShape,
+    i: number
+  ) => JSX.Element;
+}
+export interface AdHocColumnProps2<
+  DataShape,
+  FieldKey1 extends keyof DataShape,
+  FieldKey2 extends keyof DataShape[FieldKey1]
+> {
+  title: string;
+  hideColTitle?: boolean;
+  fieldKey: [FieldKey1, FieldKey2];
+  renderdata?: (
+    fieldData: DataShape[FieldKey1][FieldKey2],
+    rowData: DataShape,
+    i: number
+  ) => JSX.Element;
+}
+export interface AdHocColumnProps3<
+  DataShape,
+  FieldKey1 extends keyof DataShape,
+  FieldKey2 extends keyof DataShape[FieldKey1],
+  FieldKey3 extends keyof DataShape[FieldKey1][FieldKey2]
+> {
+  title: string;
+  hideColTitle?: boolean;
+  fieldKey: [FieldKey1, FieldKey2, FieldKey3];
+  renderdata?: (
+    fieldData: DataShape[FieldKey1][FieldKey2][FieldKey3],
+    rowData: DataShape,
+    i: number
+  ) => JSX.Element;
+}
+
+export type AdhocListColumnProps<
+  DataShape,
+  FieldKey1 extends keyof DataShape,
+  FieldKey2 extends keyof DataShape[FieldKey1],
+  FieldKey3 extends keyof DataShape[FieldKey1][FieldKey2]
+> =
+  | AdHocColumnProps1<DataShape, FieldKey1>
+  | AdHocColumnProps2<DataShape, FieldKey1, FieldKey2>
+  | AdHocColumnProps3<DataShape, FieldKey1, FieldKey2, FieldKey3>;
+
 const makeAdhocList = <DataShape extends {}>() => {
-  interface AdHocColumnProps1<FieldKey1 extends keyof DataShape> {
-    title: string;
-    hideColTitle?: boolean;
-    fieldKey: FieldKey1;
-    renderdata?: (
-      fieldData: DataShape[FieldKey1],
-      rowData: DataShape,
-      i: number
-    ) => JSX.Element;
-  }
-  interface AdHocColumnProps2<
-    FieldKey1 extends keyof DataShape,
-    FieldKey2 extends keyof DataShape[FieldKey1]
-  > {
-    title: string;
-    hideColTitle?: boolean;
-    fieldKey: [FieldKey1, FieldKey2];
-    renderdata?: (
-      fieldData: DataShape[FieldKey1][FieldKey2],
-      rowData: DataShape,
-      i: number
-    ) => JSX.Element;
-  }
-  interface AdHocColumnProps3<
-    FieldKey1 extends keyof DataShape,
-    FieldKey2 extends keyof DataShape[FieldKey1],
-    FieldKey3 extends keyof DataShape[FieldKey1][FieldKey2]
-  > {
-    title: string;
-    hideColTitle?: boolean;
-    fieldKey: [FieldKey1, FieldKey2, FieldKey3];
-    renderdata?: (
-      fieldData: DataShape[FieldKey1][FieldKey2][FieldKey3],
-      rowData: DataShape,
-      i: number
-    ) => JSX.Element;
-  }
-
-  type AdhocListColumnProps<
-    FieldKey1 extends keyof DataShape,
-    FieldKey2 extends keyof DataShape[FieldKey1],
-    FieldKey3 extends keyof DataShape[FieldKey1][FieldKey2]
-  > =
-    | AdHocColumnProps1<FieldKey1>
-    | AdHocColumnProps2<FieldKey1, FieldKey2>
-    | AdHocColumnProps3<FieldKey1, FieldKey2, FieldKey3>;
-
   type RowContext = {
     rowData: DataShape;
     i: number;
@@ -157,7 +163,7 @@ const makeAdhocList = <DataShape extends {}>() => {
     FieldKey2 extends keyof DataShape[FieldKey1],
     FieldKey3 extends keyof DataShape[FieldKey1][FieldKey2]
   >(
-    props: AdhocListColumnProps<FieldKey1, FieldKey2, FieldKey3>
+    props: AdhocListColumnProps<DataShape, FieldKey1, FieldKey2, FieldKey3>
   ): React.ReactElement<any> => {
     const rc = useContext(rowContext);
     if (!rc) {
@@ -172,7 +178,8 @@ const makeAdhocList = <DataShape extends {}>() => {
         rowData,
         i
       );
-      if (resultElement.type !== TableCell) {
+      console.log("resultElement", resultElement);
+      if (resultElement.type?.options?.name !== "MuiTableCell") {
         throw new Error(
           "render prop on AdhocListColumn must return a <TableCell> element"
         );
@@ -224,7 +231,9 @@ const makeAdhocList = <DataShape extends {}>() => {
         iconAndTextSize?: Size;
         tableCaption: string;
         getDataObservable: () => Observable<DataShape[]>;
-        children: React.ReactElement<AdhocListColumnProps<any, any, any>>[];
+        children: React.ReactElement<
+          AdhocListColumnProps<DataShape, any, any, any>
+        >[];
       }
     | {
         type: "paginated";
@@ -242,7 +251,9 @@ const makeAdhocList = <DataShape extends {}>() => {
           data: DataShape[];
           total: number;
         }>;
-        children: React.ReactElement<AdhocListColumnProps<any, any, any>>[];
+        children: React.ReactElement<
+          AdhocListColumnProps<DataShape, any, any, any>
+        >[];
       };
   const AdhocList = <
     TitleTypographyComponent extends React.ElementType = "span"
@@ -303,10 +314,10 @@ const makeAdhocList = <DataShape extends {}>() => {
     }, [setState, props.type, props.getDataObservable, paginationState]);
 
     useEffect(() => {
-      fetchData();
+      return fetchData();
     }, []); // eslint-disable-line
     useEffect(() => {
-      fetchData();
+      return fetchData();
     }, [paginationState.page, paginationState.size]); // eslint-disable-line
 
     const TableProps: Partial<TableProps> = useMemo((): Partial<TableProps> => {
