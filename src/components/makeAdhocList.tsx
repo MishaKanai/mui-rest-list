@@ -184,9 +184,10 @@ const makeAdhocList = <DataShape extends {}>() => {
         rowData,
         i
       );
-      if (resultElement.type?.options?.name !== "MuiTableCell") {
+      if (resultElement.type !== TableCell) {
         throw new Error(
-          "render prop on AdhocListColumn must return a <TableCell> element"
+          `render prop on AdhocListColumn must return a <TableCell> element
+          (Also ensure you are using a matching version of @material-ui/core)`
         );
       }
       return resultElement;
