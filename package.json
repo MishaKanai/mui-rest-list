@@ -17,6 +17,7 @@
   "author": "Misha Kanai",
   "license": "MIT",
   "devDependencies": {
+    "@react-theming/storybook-addon": "1.0.3",
     "@storybook/addon-a11y": "5.3.19",
     "@storybook/addon-actions": "5.3.19",
     "@storybook/addon-docs": "5.3.19",

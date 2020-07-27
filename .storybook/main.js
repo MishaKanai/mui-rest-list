@@ -7,6 +7,7 @@ module.exports = {
     "@storybook/addon-knobs",
     "@storybook/addon-info",
     "@storybook/addon-a11y/register",
+    "@react-theming/storybook-addon",
     {
       name: "@storybook/addon-docs",
       options: {

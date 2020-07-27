@@ -2,6 +2,7 @@ import React from "react";
 import makeAdhocList from "../components/makeAdhocList";
 import { delay, map } from "rxjs/operators";
 import { ajaxGetJSON } from "rxjs/internal/observable/dom/AjaxObservable";
+import { Card } from "@material-ui/core";
 
 type StarWarsPersonSearch = {
   count: number;
@@ -42,26 +43,28 @@ const getDataObservable = (params: { size: number; page: number }) =>
   );
 export const StarWarsCharacterList = () => {
   return (
-    <AdhocList
-      type="paginated"
-      titleOptions={{
-        type: "Typography",
-        TypographyProps: {
-          variant: "h4",
-        },
-        text: "Star Wars Characters",
-      }}
-      pagesNIndexed={1}
-      defaultSize={10}
-      // paginationOptions={10}
-      hasRefresh={true}
-      getDataObservable={getDataObservable}
-      tableCaption="Star Wars Characters"
-    >
-      <AdhocListColumn title="name" fieldKey="name" />
-      <AdhocListColumn title="height" fieldKey="height" />
-      <AdhocListColumn title="mass" fieldKey="mass" />
-      <AdhocListColumn title="homeworld" fieldKey="homeworld" />
-    </AdhocList>
+    <Card style={{ margin: "1em", padding: "1em" }}>
+      <AdhocList
+        type="paginated"
+        titleOptions={{
+          type: "Typography",
+          TypographyProps: {
+            variant: "h4",
+          },
+          text: "Star Wars Characters",
+        }}
+        pagesNIndexed={1}
+        defaultSize={10}
+        // paginationOptions={10}
+        hasRefresh={true}
+        getDataObservable={getDataObservable}
+        tableCaption="Star Wars Characters"
+      >
+        <AdhocListColumn title="name" fieldKey="name" />
+        <AdhocListColumn title="height" fieldKey="height" />
+        <AdhocListColumn title="mass" fieldKey="mass" />
+        <AdhocListColumn title="homeworld" fieldKey="homeworld" />
+      </AdhocList>
+    </Card>
   );
 };
