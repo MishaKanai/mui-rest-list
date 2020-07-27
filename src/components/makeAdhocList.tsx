@@ -19,7 +19,7 @@ import {
   Typography,
   TypographyProps,
   TableProps,
-  TypographyTypeMap,
+  TableCellProps,
 } from "@material-ui/core";
 import { Observable } from "rxjs";
 import {
@@ -105,6 +105,7 @@ export interface AdHocColumnProps1<
   title: string;
   hideColTitle?: boolean;
   fieldKey: FieldKey1;
+  firstColumn?: boolean;
   renderdata?: (
     fieldData: DataShape[FieldKey1],
     rowData: DataShape,
@@ -118,6 +119,7 @@ export interface AdHocColumnProps2<
 > {
   title: string;
   hideColTitle?: boolean;
+  firstColumn?: boolean;
   fieldKey: [FieldKey1, FieldKey2];
   renderdata?: (
     fieldData: DataShape[FieldKey1][FieldKey2],
@@ -133,6 +135,7 @@ export interface AdHocColumnProps3<
 > {
   title: string;
   hideColTitle?: boolean;
+  firstColumn?: boolean;
   fieldKey: [FieldKey1, FieldKey2, FieldKey3];
   renderdata?: (
     fieldData: DataShape[FieldKey1][FieldKey2][FieldKey3],
@@ -171,6 +174,9 @@ const makeAdhocList = <DataShape extends {}>() => {
         "an <AdhocListColumn> must be a child of <AdhocList></AdhocList>"
       );
     }
+    const TableCellProps: TableCellProps | null = props.firstColumn
+      ? { component: "th", scope: "row" }
+      : null;
     const { rowData, i } = rc;
     if (props.renderdata) {
       const resultElement = props.renderdata(
@@ -178,7 +184,6 @@ const makeAdhocList = <DataShape extends {}>() => {
         rowData,
         i
       );
-      console.log("resultElement", resultElement);
       if (resultElement.type?.options?.name !== "MuiTableCell") {
         throw new Error(
           "render prop on AdhocListColumn must return a <TableCell> element"
@@ -188,13 +193,13 @@ const makeAdhocList = <DataShape extends {}>() => {
     }
     const fieldData = get(rowData, props.fieldKey);
     if (typeof fieldData === "string" || typeof fieldData === "number") {
-      return <TableCell>{fieldData}</TableCell>;
+      return <TableCell {...TableCellProps}>{fieldData}</TableCell>;
     }
     // todo handle dates.
     if (typeof fieldData === "object") {
-      return <TableCell>Unhandled Object Type</TableCell>;
+      return <TableCell {...TableCellProps}>Unhandled Object Type</TableCell>;
     }
-    return <TableCell />;
+    return <TableCell {...TableCellProps} />;
   };
   type TitleOptions<
     TitleTypographyComponent extends React.ElementType = "span"
@@ -381,7 +386,11 @@ const makeAdhocList = <DataShape extends {}>() => {
                     i,
                   }}
                 >
-                  <TableRow>{props.children}</TableRow>
+                  <TableRow>
+                    {React.Children.map(props.children, (c, i) =>
+                      i === 0 ? React.cloneElement(c, { firstColumn: true }) : c
+                    )}
+                  </TableRow>
                 </rowContext.Provider>
               ))}
             </TableBody>
