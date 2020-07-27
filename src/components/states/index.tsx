@@ -69,7 +69,7 @@ interface BaseErrorProps {
   subText?: string;
   size: Size;
 }
-const BaseError: React.FunctionComponent<BaseErrorProps> = (props) => {
+export const BaseError: React.FunctionComponent<BaseErrorProps> = (props) => {
   const { retry, Icon, headingText, subText, size } = props;
   const classes = useStyles({ size });
   return (
