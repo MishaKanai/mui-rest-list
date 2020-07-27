@@ -1,26 +1,28 @@
-const path = require('path');
+const path = require("path");
 
 module.exports = {
   addons: [
-    '@storybook/addon-actions',
-    '@storybook/addon-links',
-    '@storybook/addon-knobs',
+    "@storybook/addon-actions",
+    "@storybook/addon-links",
+    "@storybook/addon-knobs",
+    "@storybook/addon-info",
+    "@storybook/addon-a11y/register",
     {
-      name: '@storybook/addon-docs',
+      name: "@storybook/addon-docs",
       options: {
         configureJSX: true,
       },
     },
   ],
-  stories: ['../src/stories/*.stories.tsx'],
-  webpackFinal: async config => {
+  stories: ["../src/stories/*.stories.tsx"],
+  webpackFinal: async (config) => {
     config.module.rules.push({
       test: /\.(ts|tsx)$/,
       include: path.resolve(__dirname, "../src"),
       use: [
         require.resolve("ts-loader"),
         {
-          loader: require.resolve('react-docgen-typescript-loader'),
+          loader: require.resolve("react-docgen-typescript-loader"),
           options: {
             // Provide the path to your tsconfig.json so that your stories can
             // display types from outside each individual story.
@@ -29,7 +31,7 @@ module.exports = {
         },
       ],
     });
-    config.resolve.extensions.push('.ts', '.tsx');
+    config.resolve.extensions.push(".ts", ".tsx");
     return config;
   },
 };

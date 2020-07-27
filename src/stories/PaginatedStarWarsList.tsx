@@ -53,7 +53,7 @@ export const StarWarsCharacterList = () => {
       }}
       pagesNIndexed={1}
       defaultSize={10}
-      paginationOptions={10}
+      // paginationOptions={10}
       hasRefresh={true}
       getDataObservable={getDataObservable}
       tableCaption="Star Wars Characters"

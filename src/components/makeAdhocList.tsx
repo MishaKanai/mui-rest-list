@@ -345,7 +345,10 @@ const makeAdhocList = <DataShape extends {}>() => {
         <>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             {titleOptions.type === "Typography" ? (
-              <Typography {...titleOptions.TypographyProps}>
+              <Typography
+                id={titleId.current}
+                {...titleOptions.TypographyProps}
+              >
                 {titleOptions.text}
               </Typography>
             ) : titleOptions.type === "aria-labelled-by" ||

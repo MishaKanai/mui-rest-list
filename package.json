@@ -1,6 +1,6 @@
 {
   "name": "mui-rest-list",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "main": "lib/components/index.js",
   "types": "lib/components/index.d.ts",
   "files": [
@@ -17,6 +17,7 @@
   "author": "Misha Kanai",
   "license": "MIT",
   "devDependencies": {
+    "@storybook/addon-a11y": "5.3.19",
     "@storybook/addon-actions": "5.3.19",
     "@storybook/addon-docs": "5.3.19",
     "@storybook/addon-info": "5.3.19",
