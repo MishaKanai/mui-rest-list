@@ -318,10 +318,6 @@ const makeAdhocList = <DataShape extends {}>() => {
       // eslint seems to be having trouble due to the type discrimination I'm doing.
       // (It demands I pass 'props'.) Lets just eyeball that this is correct.
     }, [setState, props.type, props.getDataObservable, paginationState]);
-
-    useEffect(() => {
-      return fetchData();
-    }, []); // eslint-disable-line
     useEffect(() => {
       return fetchData();
     }, [paginationState.page, paginationState.size]); // eslint-disable-line
