@@ -24,6 +24,7 @@ interface PaginationProps {
   classes?: {};
   className?: string;
   rowsPerPageOptions?: number[];
+  SelectProps?: {};
 }
 const emptyArray: number[] = [];
 const defaultRowsPerPageOptions = [5, 10, 25, 100];
@@ -140,6 +141,7 @@ const Pagination: FunctionComponent<PaginationProps> = (props) => {
         SelectDisplayProps: {
           "aria-describedby": mediumRPPLabelId.current,
         },
+        ...props.SelectProps,
       }}
     />
   );
