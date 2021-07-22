@@ -29,6 +29,18 @@ interface PaginationProps {
 const emptyArray: number[] = [];
 const defaultRowsPerPageOptions = [5, 10, 25, 100];
 
+const useAccumulatePerPageOptions = (initialOptions: number[], perPage: number) => {
+  const initialSet = useMemo(() => new Set(initialOptions), []);
+  const accumulatePerPagesSet = useRef(initialSet);
+  return useMemo(() => {
+    initialOptions.forEach(option => accumulatePerPagesSet.current.add(option));
+    if (typeof perPage === 'number') {
+      accumulatePerPagesSet.current.add(perPage);
+    }
+    return Array.from(accumulatePerPagesSet.current).sort((a, b) => a - b)
+  }, [initialOptions, perPage])
+}
+
 const Pagination: FunctionComponent<PaginationProps> = (props) => {
   const {
     total,
@@ -36,9 +48,10 @@ const Pagination: FunctionComponent<PaginationProps> = (props) => {
     setPage,
     page,
     setPerPage,
-    rowsPerPageOptions = defaultRowsPerPageOptions,
+    rowsPerPageOptions: _rowsPerPageOptions = defaultRowsPerPageOptions,
     showSmall,
   } = props;
+  const rowsPerPageOptions = useAccumulatePerPageOptions(_rowsPerPageOptions, perPage);
   const width = useWidth();
   const rppId = useMemo(() => uniqueId("rowsPerPage"), []);
   const mediumRPPLabelId = useRef(rppId);
