@@ -3,6 +3,7 @@ import makeAdhocList from "../components/makeAdhocList";
 // @ts-ignore
 import { withKnobs, object } from "@storybook/addon-knobs/react";
 import { StarWarsCharacterList } from "./PaginatedStarWarsList";
+import { MaxCountPokemonList } from "./PaginatedMaxCountPokemonList";
 import { ColorList } from "./UnpaginatedList";
 import { withInfo } from "@storybook/addon-info";
 import { withA11y } from "@storybook/addon-a11y";
@@ -32,4 +33,4 @@ export default {
   ],
 };
 
-export { StarWarsCharacterList, ColorList };
+export { StarWarsCharacterList, ColorList, MaxCountPokemonList };

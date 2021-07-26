@@ -237,9 +237,9 @@ const makeAdhocList = <DataShape extends {}>() => {
         iconAndTextSize?: Size;
         tableCaption: string;
         getDataObservable: () => Observable<DataShape[]>;
-        children: React.ReactElement<
-          AdhocListColumnProps<DataShape, any, any, any>
-        >[];
+        children:
+          | React.ReactElement<AdhocListColumnProps<DataShape, any, any, any>>[]
+          | React.ReactElement<AdhocListColumnProps<DataShape, any, any, any>>;
       }
     | {
         type: "paginated";
@@ -250,6 +250,7 @@ const makeAdhocList = <DataShape extends {}>() => {
         defaultSize: number;
         tableCaption: string;
         paginationOptions?: number[] | number;
+        maxExactTotalCount?: number;
         getDataObservable: (params: {
           size: number;
           page: number;
@@ -257,9 +258,9 @@ const makeAdhocList = <DataShape extends {}>() => {
           data: DataShape[];
           total: number;
         }>;
-        children: React.ReactElement<
-          AdhocListColumnProps<DataShape, any, any, any>
-        >[];
+        children:
+          | React.ReactElement<AdhocListColumnProps<DataShape, any, any, any>>[]
+          | React.ReactElement<AdhocListColumnProps<DataShape, any, any, any>>;
       };
   const AdhocList = <
     TitleTypographyComponent extends React.ElementType = "span"
@@ -397,6 +398,7 @@ const makeAdhocList = <DataShape extends {}>() => {
           </Table>
           {props.type === "paginated" && (
             <Pagination
+              maxExactTotalCount={props.maxExactTotalCount}
               page={paginationState.page + (props.pagesNIndexed === 0 ? 1 : 0)}
               perPage={paginationState.size}
               setPage={(page: number) => {

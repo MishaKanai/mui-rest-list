@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) =>
 );
 
 interface TableCellProps extends React.ComponentProps<typeof TableCell> {}
-interface PaginationActionsProps extends TableCellProps {
+export interface PaginationActionsProps extends TableCellProps {
   backIconButtonProps?: {};
   count: number;
   nextIconButtonProps?: {};
@@ -39,10 +39,11 @@ interface PaginationActionsProps extends TableCellProps {
   rowsPerPage: number;
 }
 
-export const PaginationActions: FunctionComponent<PaginationActionsProps> = (
+export const PaginationActions: FunctionComponent<PaginationActionsProps & { showEndPages?: boolean; }> = (
   props
 ) => {
-  const { page, rowsPerPage, count, onChangePage } = props;
+  const { page, rowsPerPage, count, onChangePage, showEndPages = true } = props;
+
   const classes = useStyles();
   /**
    * Warning: material-ui's page is 0-based
@@ -79,7 +80,9 @@ export const PaginationActions: FunctionComponent<PaginationActionsProps> = (
     if (page < nbPages - 2) {
       input.push(nbPages);
     }
-
+    if (!showEndPages && page < nbPages - 4 && input.includes('.')) {
+      return input.slice(0, input.lastIndexOf('.') + 1)
+    }
     return input;
   }, [page, rowsPerPage, count]);
 
@@ -118,7 +121,6 @@ export const PaginationActions: FunctionComponent<PaginationActionsProps> = (
     },
     [page, nbPages, onChangePage]
   );
-
   const renderPageNums = () => {
     return range.map((pageNum, index) =>
       pageNum === "." ? (

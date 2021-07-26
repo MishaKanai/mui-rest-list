@@ -9,9 +9,16 @@ import React, {
 import TablePagination, {
   LabelDisplayedRowsArgs,
 } from "@material-ui/core/TablePagination";
-import PaginationActions from "./Actions";
+import PaginationActions, { PaginationActionsProps } from "./Actions";
 import uniqueId from "lodash.uniqueid";
 import useWidth from "../../util/useWidth";
+
+const PaginationWithEnd = (props: PaginationActionsProps) => (
+  <PaginationActions {...props} />
+);
+const PaginationWithoutEnd = (props: PaginationActionsProps) => (
+  <PaginationActions {...props} showEndPages={false} />
+);
 
 interface PaginationProps {
   page: number;
@@ -19,6 +26,10 @@ interface PaginationProps {
   setPage: (page: number) => void;
   setPerPage: (perPage: number) => void;
   total: number;
+  // If count(*) is very expensive, we might have a 'maxExactTotalCount', for which any total above that indicates we didn't do the full count.
+  // E.g. if maxExactTotalCount={5000} and total is 5001, the true total might be any number > 5000.
+  // In that case, we should display '1 of 5000+' as the count, and not show buttons to skip to the last page, since we don't know how many pages there are.
+  maxExactTotalCount?: number;
 
   showSmall?: boolean;
   classes?: {};
@@ -29,17 +40,22 @@ interface PaginationProps {
 const emptyArray: number[] = [];
 const defaultRowsPerPageOptions = [5, 10, 25, 100];
 
-const useAccumulatePerPageOptions = (initialOptions: number[], perPage: number) => {
+const useAccumulatePerPageOptions = (
+  initialOptions: number[],
+  perPage: number
+) => {
   const initialSet = useMemo(() => new Set(initialOptions), []);
   const accumulatePerPagesSet = useRef(initialSet);
   return useMemo(() => {
-    initialOptions.forEach(option => accumulatePerPagesSet.current.add(option));
-    if (typeof perPage === 'number') {
+    initialOptions.forEach((option) =>
+      accumulatePerPagesSet.current.add(option)
+    );
+    if (typeof perPage === "number") {
       accumulatePerPagesSet.current.add(perPage);
     }
-    return Array.from(accumulatePerPagesSet.current).sort((a, b) => a - b)
-  }, [initialOptions, perPage])
-}
+    return Array.from(accumulatePerPagesSet.current).sort((a, b) => a - b);
+  }, [initialOptions, perPage]);
+};
 
 const Pagination: FunctionComponent<PaginationProps> = (props) => {
   const {
@@ -50,8 +66,12 @@ const Pagination: FunctionComponent<PaginationProps> = (props) => {
     setPerPage,
     rowsPerPageOptions: _rowsPerPageOptions = defaultRowsPerPageOptions,
     showSmall,
+    maxExactTotalCount,
   } = props;
-  const rowsPerPageOptions = useAccumulatePerPageOptions(_rowsPerPageOptions, perPage);
+  const rowsPerPageOptions = useAccumulatePerPageOptions(
+    _rowsPerPageOptions,
+    perPage
+  );
   const width = useWidth();
   const rppId = useMemo(() => uniqueId("rowsPerPage"), []);
   const mediumRPPLabelId = useRef(rppId);
@@ -91,12 +111,31 @@ const Pagination: FunctionComponent<PaginationProps> = (props) => {
     },
     [setPerPage]
   );
+  const beyondMaxExactTotalCount = Boolean(
+    maxExactTotalCount && total > maxExactTotalCount
+  );
   const labelDisplayedRows = useCallback(
     ({ from, to, count }: LabelDisplayedRowsArgs) => {
-      return `${from}-${to} of ${count}`;
+      return `${from}-${to} of ${
+        beyondMaxExactTotalCount ? maxExactTotalCount + "+" : count
+      }`;
     },
-    []
+    [beyondMaxExactTotalCount, maxExactTotalCount]
   );
+
+  const PaginationComponent = useMemo(() => {
+    // if we are not on/near the final page, and beyondMaxExactTotalCount, don't show the final pages.
+
+    if (
+      !beyondMaxExactTotalCount ||
+      page === nbPages - 1 ||
+      page === nbPages - 2 ||
+      page === nbPages - 3
+    ) {
+      return PaginationWithEnd;
+    }
+    return PaginationWithoutEnd;
+  }, [beyondMaxExactTotalCount, page, nbPages]);
 
   if (total === 0) {
     return null;
@@ -134,7 +173,7 @@ const Pagination: FunctionComponent<PaginationProps> = (props) => {
       page={page - 1}
       onChangePage={handlePageChange}
       onChangeRowsPerPage={handlePerPageChange}
-      ActionsComponent={PaginationActions}
+      ActionsComponent={PaginationComponent}
       component="span"
       // In the near future we should be able to use labelId={this.mediumRPPLabelId}
       // for now it causes an annoying proptype error...
