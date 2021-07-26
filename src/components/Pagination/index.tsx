@@ -20,7 +20,7 @@ const PaginationWithoutEnd = (props: PaginationActionsProps) => (
   <PaginationActions {...props} showEndPages={false} />
 );
 
-interface PaginationProps {
+export interface PaginationProps {
   page: number;
   perPage: number;
   setPage: (page: number) => void;
