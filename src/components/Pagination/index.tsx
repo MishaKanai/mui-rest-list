@@ -115,9 +115,9 @@ const Pagination: FunctionComponent<PaginationProps> = (props) => {
     maxExactTotalCount && total > maxExactTotalCount
   );
   const labelDisplayedRows = useCallback(
-    ({ from, to, count }: LabelDisplayedRowsArgs) => {
+    ({ from, to, count, page }: LabelDisplayedRowsArgs) => {
       return `${from}-${to} of ${
-        beyondMaxExactTotalCount ? maxExactTotalCount + "+" : count
+        beyondMaxExactTotalCount && maxExactTotalCount ? Math.max(to, maxExactTotalCount) + "+" : count
       }`;
     },
     [beyondMaxExactTotalCount, maxExactTotalCount]
