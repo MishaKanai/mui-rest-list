@@ -232,6 +232,7 @@ const makeAdhocList = <DataShape extends {}>() => {
   > =
     | {
         type: "unpaginated";
+        renderNoResults?: (props: { refresh: () => void }) => JSX.Element;
         titleOptions: TitleOptions<TitleTypographyComponent>;
         hasRefresh?: boolean;
         iconAndTextSize?: Size;
@@ -243,6 +244,7 @@ const makeAdhocList = <DataShape extends {}>() => {
       }
     | {
         type: "paginated";
+        renderNoResults?: (props: { refresh: () => void }) => JSX.Element;
         titleOptions: TitleOptions<TitleTypographyComponent>;
         iconAndTextSize?: Size;
         hasRefresh?: boolean;
@@ -361,41 +363,51 @@ const makeAdhocList = <DataShape extends {}>() => {
               </div>
             )}
           </div>
-          <Table {...TableProps}>
-            <caption className={classes.offScreen}>
-              {props.tableCaption}
-            </caption>
-            <TableHead>
-              <TableRow>
-                {React.Children.map(props.children, (c, i) =>
-                  c.props.hideColTitle ? (
-                    <TableCell key={i}>
-                      <span className={classes.offScreen}>{c.props.title}</span>
-                    </TableCell>
-                  ) : (
-                    <TableCell key={i}>{c.props.title}</TableCell>
-                  )
-                )}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {data.map((rowData, i) => (
-                <rowContext.Provider
-                  key={i}
-                  value={{
-                    rowData,
-                    i,
-                  }}
-                >
-                  <TableRow>
-                    {React.Children.map(props.children, (c, i) =>
-                      i === 0 ? React.cloneElement(c, { firstColumn: true }) : c
-                    )}
-                  </TableRow>
-                </rowContext.Provider>
-              ))}
-            </TableBody>
-          </Table>
+          {total === 0 && props.renderNoResults ? (
+            props.renderNoResults({
+              refresh: fetchData,
+            })
+          ) : (
+            <Table {...TableProps}>
+              <caption className={classes.offScreen}>
+                {props.tableCaption}
+              </caption>
+              <TableHead>
+                <TableRow>
+                  {React.Children.map(props.children, (c, i) =>
+                    c.props.hideColTitle ? (
+                      <TableCell key={i}>
+                        <span className={classes.offScreen}>
+                          {c.props.title}
+                        </span>
+                      </TableCell>
+                    ) : (
+                      <TableCell key={i}>{c.props.title}</TableCell>
+                    )
+                  )}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data.map((rowData, i) => (
+                  <rowContext.Provider
+                    key={i}
+                    value={{
+                      rowData,
+                      i,
+                    }}
+                  >
+                    <TableRow>
+                      {React.Children.map(props.children, (c, i) =>
+                        i === 0
+                          ? React.cloneElement(c, { firstColumn: true })
+                          : c
+                      )}
+                    </TableRow>
+                  </rowContext.Provider>
+                ))}
+              </TableBody>
+            </Table>
+          )}
           {props.type === "paginated" && (
             <Pagination
               maxExactTotalCount={props.maxExactTotalCount}
