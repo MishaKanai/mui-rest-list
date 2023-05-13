@@ -233,6 +233,7 @@ const makeAdhocList = <DataShape extends {}>() => {
     | {
         type: "unpaginated";
         renderNoResults?: (props: { refresh: () => void }) => JSX.Element;
+        renderBelowTitle?: () => JSX.Element;
         titleOptions: TitleOptions<TitleTypographyComponent>;
         hasRefresh?: boolean;
         iconAndTextSize?: Size;
@@ -245,6 +246,7 @@ const makeAdhocList = <DataShape extends {}>() => {
     | {
         type: "paginated";
         renderNoResults?: (props: { refresh: () => void }) => JSX.Element;
+        renderBelowTitle?: () => JSX.Element;
         titleOptions: TitleOptions<TitleTypographyComponent>;
         iconAndTextSize?: Size;
         hasRefresh?: boolean;
@@ -363,6 +365,7 @@ const makeAdhocList = <DataShape extends {}>() => {
               </div>
             )}
           </div>
+          {props.renderBelowTitle?.() ?? null}
           {total === 0 && props.renderNoResults ? (
             props.renderNoResults({
               refresh: fetchData,
