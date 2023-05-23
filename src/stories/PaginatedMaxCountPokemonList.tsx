@@ -65,8 +65,8 @@ const { AdhocList, AdhocListColumn } = makeAdhocList<
   PokemonSearch["results"][0]
 >();
 
-const getDataObservable = (params: { size: number; page: number }) =>
-  ajaxGetJSON<PokemonSearch>(
+const getDataObservable = (params: { size: number; page: number }) => {
+  return ajaxGetJSON<PokemonSearch>(
     `https://pokeapi.co/api/v2/pokemon-species/?offset=${(params.page - 1) * params.size}&limit=${params.size}`
   ).pipe(
     map((d) => ({
@@ -74,6 +74,7 @@ const getDataObservable = (params: { size: number; page: number }) =>
       data: d.results,
     }))
   );
+}
 export const MaxCountPokemonList = () => {
   return (
     <Card style={{ margin: "1em", padding: "1em" }}>
@@ -94,7 +95,7 @@ export const MaxCountPokemonList = () => {
         tableCaption="Pokemon species"
         
       >
-        <AdhocListColumn title="name" fieldKey="name" />
+        <AdhocListColumn sortable title="name" fieldKey="name" />
       </AdhocList>
     </Card>
   );

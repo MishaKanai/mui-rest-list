@@ -20,6 +20,7 @@ import {
   TypographyProps,
   TableProps,
   TableCellProps,
+  Tooltip,
 } from "@material-ui/core";
 import { Observable } from "rxjs";
 import {
@@ -37,6 +38,7 @@ import get from "lodash.get";
 import { Size, NetworkUnavailable, ServerError, Pending } from "./states";
 import Pagination from "./Pagination";
 import uniqueId from "lodash.uniqueid";
+import SortLabel from "./TableHeader/SortLabel";
 
 const usePagination = (pagesNIndexed: 0 | 1, defaultSize: number = 10) => {
   const [paginationState, dispatch] = useReducer(
@@ -67,6 +69,13 @@ const usePagination = (pagesNIndexed: 0 | 1, defaultSize: number = 10) => {
 
 const useStyles = makeStyles((theme) =>
   createStyles({
+    headerCell: {
+      position: 'sticky',
+      zIndex: 3,
+      backgroundColor: theme.palette.background.paper,
+      top: 0,
+      paddingLeft: '1em',
+    },
     offScreen: {
       position: "absolute",
       left: "-10000px",
@@ -98,11 +107,22 @@ const HiddenAriaLive = <T extends any>(props: {
   );
 };
 
+export type Order = [string, 'asc' | 'desc'] | null;
+
+export type GetObservableParams<Filter> = {
+  orderBy?: Order;
+  size?: number;
+  page?: number;
+  filter?: Filter;
+}
+
 export interface AdHocColumnProps1<
   DataShape,
   FieldKey1 extends keyof DataShape
 > {
   title: string;
+  sortable?: boolean;
+  initialSort?: 'asc' | 'desc';
   hideColTitle?: boolean;
   fieldKey: FieldKey1;
   firstColumn?: boolean;
@@ -118,6 +138,8 @@ export interface AdHocColumnProps2<
   FieldKey2 extends keyof DataShape[FieldKey1]
 > {
   title: string;
+  sortable?: boolean;
+  initialSort?: 'asc' | 'desc';
   hideColTitle?: boolean;
   firstColumn?: boolean;
   fieldKey: [FieldKey1, FieldKey2];
@@ -134,6 +156,8 @@ export interface AdHocColumnProps3<
   FieldKey3 extends keyof DataShape[FieldKey1][FieldKey2]
 > {
   title: string;
+  sortable?: boolean;
+  initialSort?: 'asc' | 'desc';
   hideColTitle?: boolean;
   firstColumn?: boolean;
   fieldKey: [FieldKey1, FieldKey2, FieldKey3];
@@ -193,14 +217,12 @@ const makeAdhocList = <DataShape extends {}>() => {
       return resultElement;
     }
     const fieldData = get(rowData, props.fieldKey);
-    if (typeof fieldData === "string" || typeof fieldData === "number") {
-      return <TableCell {...TableCellProps}>{fieldData}</TableCell>;
-    }
-    // todo handle dates.
-    if (typeof fieldData === "object") {
-      return <TableCell {...TableCellProps}>Unhandled Object Type</TableCell>;
-    }
-    return <TableCell {...TableCellProps} />;
+    const tableHeadingCellChildren = (
+      typeof fieldData === "string" || typeof fieldData === "number"
+    ) ? fieldData : typeof fieldData === "object" ? 'Unhandled Object Type' : undefined;
+    
+      return <TableCell {...TableCellProps}>{tableHeadingCellChildren}</TableCell>;
+    
   };
   type TitleOptions<
     TitleTypographyComponent extends React.ElementType = "span"
@@ -227,44 +249,38 @@ const makeAdhocList = <DataShape extends {}>() => {
         render: (elementId: string) => JSX.Element;
       };
 
-type GetDataObservableNoPag<Filter> = (params?: {
-  filter: Filter;
-}) => Observable<DataShape[]>;
-
-type GetDataObservablePag<Filter> = (params: {
-  filter: Filter;
-  size: number;
-  page: number;
-}) => Observable<{
-  data: DataShape[];
-  total: number;
-}>;
-
+  
 type RenderFilter<Filter> = (params: {
   filter: Filter;
   setFilter: (filter: Filter) => void;
   fetchData: () => void;
 }) => JSX.Element;
 
+// All unpaginated props
 type UnpaginatedPropsWithFilter<Filter> = {
   initialFilter: Filter;
   getDataObservable:  (params?: {
     filter: Filter;
+    orderBy?: Order;
   }) => Observable<DataShape[]>;
   renderFilter?: RenderFilter<Filter>
+}
+type UnpaginatedPropsWithoutFilter = {
+  initialFilter?: never;
+  getDataObservable: (params?: {
+    orderBy?: Order;
+  }) => Observable<DataShape[]>;
 }
 type UnpaginatedProps<Filter> = {
   type: "unpaginated";
   renderNoResults?: (props: { refresh: () => void }) => JSX.Element;
-  getDataObservable: GetDataObservableNoPag<Filter>;
-} & (UnpaginatedPropsWithFilter<Filter> | {
-  initialFilter?: never;
-  getDataObservable: () => Observable<DataShape[]>;
-})
+} & (UnpaginatedPropsWithFilter<Filter> | UnpaginatedPropsWithoutFilter)
 
+// all Paginated props
 type PaginatedPropsWithFilter<Filter> = {
   initialFilter: Filter;
   getDataObservable: (params: {
+    orderBy?: Order;
     filter: Filter;
     size: number;
     page: number;
@@ -274,25 +290,28 @@ type PaginatedPropsWithFilter<Filter> = {
   }>;
   renderFilter?: RenderFilter<Filter>;
 }
+type PaginatedPropsWithoutFilter = {
+  initialFilter?: never;
+  getDataObservable: (params: {
+    orderBy?: Order;
+    size: number;
+    page: number;
+  }) => Observable<{
+    data: DataShape[];
+    total: number;
+  }>
+}
 type PaginatedProps<Filter> = {
   type: "paginated";
   pagesNIndexed: 0 | 1;
   defaultSize: number;
   paginationOptions?: number[] | number;
   maxExactTotalCount?: number;
-  getDataObservable: GetDataObservablePag<Filter>;
-} & (PaginatedPropsWithFilter<Filter> | {
-  initialFilter?: never;
-  getDataObservable: (params: {
-    size: number;
-    page: number;
-  }) => Observable<{
-    data: DataShape[];
-    total: number;
-  }>;
-})
+} & (PaginatedPropsWithFilter<Filter> | PaginatedPropsWithoutFilter);
 
+// all props with filter
 type PropsWithFilter<Filter> = UnpaginatedPropsWithFilter<Filter> | PaginatedPropsWithFilter<Filter>;
+
 
   type AdhocListProps<
     TitleTypographyComponent extends React.ElementType = "span",
@@ -317,6 +336,7 @@ type PropsWithFilter<Filter> = UnpaginatedPropsWithFilter<Filter> | PaginatedPro
     props: AdhocListProps<TitleTypographyComponent, Filter>
   ) => {
     const { iconAndTextSize = "md", titleOptions } = props;
+    const sortCaptionId = useMemo(() => uniqueId('sort-caption-'), []);
     const initialTitleId = useMemo(() => uniqueId("list-title-label"), []);
     const titleId = useRef(initialTitleId);
     const classes = useStyles();
@@ -337,6 +357,17 @@ type PropsWithFilter<Filter> = UnpaginatedPropsWithFilter<Filter> | PaginatedPro
       props.type === "paginated" ? props.defaultSize : undefined
     );
 
+    const initialSort: Order | null = useMemo(() => (props.children && !Array.isArray(props.children) ?
+    [props.children] : props.children ?? []).flatMap(child => {
+      const initialSort = child.props.initialSort;
+      if (!initialSort) {
+        return []
+      }
+      return [[child.props.fieldKey, initialSort] as Order]
+    })[0] ?? null, [props.children]);
+    
+  const [order, setOrder] = useState<Order>(initialSort);
+
     const fetchData = useCallback(() => {
       const handleError = (error: AjaxError) => {
         setState(failure(error));
@@ -345,7 +376,7 @@ type PropsWithFilter<Filter> = UnpaginatedPropsWithFilter<Filter> | PaginatedPro
       const subscription =
         props.type === "paginated"
           ? props
-              .getDataObservable({ ...paginationState, filter })
+              .getDataObservable({ ...paginationState, orderBy: order, filter })
               .subscribe(({ data, total }) => {
                 setState(
                   success({
@@ -354,7 +385,7 @@ type PropsWithFilter<Filter> = UnpaginatedPropsWithFilter<Filter> | PaginatedPro
                   })
                 );
               }, handleError)
-          : props.getDataObservable({ filter }).subscribe((res) => {
+          : props.getDataObservable({ filter, orderBy: order }).subscribe((res) => {
               setState(
                 success({
                   data: res,
@@ -369,10 +400,10 @@ type PropsWithFilter<Filter> = UnpaginatedPropsWithFilter<Filter> | PaginatedPro
       };
       // eslint seems to be having trouble due to the type discrimination I'm doing.
       // (It demands I pass 'props'.) Lets just eyeball that this is correct.
-    }, [setState, props.type, props.getDataObservable, paginationState, filter]);
+    }, [setState, props.type, props.getDataObservable, paginationState, filter, order]);
     useEffect(() => {
       return fetchData();
-    }, [paginationState.page, paginationState.size]); // eslint-disable-line
+    }, [paginationState.page, paginationState.size, order?.[0], order?.[1]]); // eslint-disable-line
 
     const TableProps: Partial<TableProps> = useMemo((): Partial<TableProps> => {
       if (
@@ -388,6 +419,8 @@ type PropsWithFilter<Filter> = UnpaginatedPropsWithFilter<Filter> | PaginatedPro
         "aria-label": titleOptions.text,
       };
     }, []);
+    const containsSomeSort = useMemo(() => (props.children && !Array.isArray(props.children) ?
+      [props.children] : props.children)?.some(f => f.props.sortable !== false), [props.children]);
     const renderTable = (state: { data: DataShape[]; total: number }) => {
       const { data, total } = state;
       return (
@@ -427,19 +460,61 @@ type PropsWithFilter<Filter> = UnpaginatedPropsWithFilter<Filter> | PaginatedPro
             <Table {...TableProps}>
               <caption className={classes.offScreen}>
                 {props.tableCaption}
+                {containsSomeSort && (
+                    <span id={sortCaptionId}>, use column header buttons to sort</span>
+                )}
               </caption>
               <TableHead>
                 <TableRow>
-                  {React.Children.map(props.children, (c, i) =>
-                    c.props.hideColTitle ? (
-                      <TableCell key={i}>
-                        <span className={classes.offScreen}>
-                          {c.props.title}
-                        </span>
-                      </TableCell>
-                    ) : (
-                      <TableCell key={i}>{c.props.title}</TableCell>
-                    )
+                  {React.Children.map(props.children, (c, i) => {
+                    const title = c.props.hideColTitle ? <span className={classes.offScreen}>
+                      {c.props.title}
+                    </span> : c.props.title;
+
+                    if (c.props.sortable) {
+                      return <TableCell
+                        className={classes.headerCell}
+                        padding="none"
+                        sortDirection={
+                          order?.[0] === c.props.fieldKey ? order?.[1] : false
+                        }
+                        // align={field.props.cellAlign}
+                    >
+                        <Tooltip title="Sort" enterDelay={300}>
+                            <SortLabel
+                                ButtonProps={{
+                                    onClick: e => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      const selectedFieldKey = c.props.fieldKey;
+                                      setOrder(currOrder => {
+                                        const fieldPath = Array.isArray(selectedFieldKey) ?
+                                          selectedFieldKey.join('.') : selectedFieldKey;
+                                        if (!currOrder) {
+                                          return [fieldPath, 'asc']
+                                        }
+                                        const [currField, currDir] = currOrder;
+                                        if (currField === fieldPath) {
+                                          return [
+                                            currField,
+                                            currDir === 'asc' ? 'desc' : 'asc'
+                                          ]
+                                        }
+                                        return [fieldPath, 'asc'];
+                                      })
+                                    },
+                                    'aria-describedby': sortCaptionId,
+                                }}
+                                label={title}
+                                active={order ? order[0] === c.props.fieldKey : undefined}
+                                direction={order?.[1]}                            />
+                        </Tooltip>
+                    </TableCell>
+                    }
+                    return <TableCell key={i}>
+                      {title}
+                    </TableCell>
+                  }
                   )}
                 </TableRow>
               </TableHead>

@@ -1,10 +1,11 @@
 import React from "react";
-import makeAdhocList from "../components/makeAdhocList";
+import makeAdhocList, { GetObservableParams, Order } from "../components/makeAdhocList";
 import { of } from "rxjs";
-import { delay } from "rxjs/operators";
+import { delay, map } from "rxjs/operators";
 // @ts-ignore
 import { withKnobs, object } from "@storybook/addon-knobs/react";
 import { TableCell, Card } from "@material-ui/core";
+import orderBy from 'lodash/orderBy';
 
 type ColorData = {
   color: string;
@@ -24,7 +25,7 @@ export default {
   decorators: [withKnobs],
 };
 
-const getDataObservable = () =>
+const getDataObservable = (params: any) =>
   of<ColorData[]>([
     {
       color: "black",
@@ -79,7 +80,16 @@ const getDataObservable = () =>
         hex: "#0F0",
       },
     },
-  ]).pipe(delay(1200));
+  ]).pipe(
+    map(list => {
+      if (!params?.orderBy) {
+        return list;
+      }
+      const [field, dir] = params.orderBy;
+      return orderBy(list, field, dir) as ColorData[]
+    }),
+    delay(1200)
+  );
 
 export const ColorList = () => {
   return (
@@ -98,9 +108,9 @@ export const ColorList = () => {
         tableCaption="Colors"
       >
         <AdhocListColumn title="color" fieldKey="color" />
-        <AdhocListColumn title="category" fieldKey="category" />
-        <AdhocListColumn title="type" fieldKey="type" />
-        <AdhocListColumn title="Hex" fieldKey={["code", "hex"]} />
+        <AdhocListColumn sortable initialSort="desc" title="category" fieldKey="category" />
+        <AdhocListColumn sortable title="type" fieldKey="type" />
+        <AdhocListColumn sortable title="Hex" fieldKey={["code", "hex"]} />
         <AdhocListColumn
           title="ColorExample"
           hideColTitle
