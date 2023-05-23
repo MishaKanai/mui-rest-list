@@ -1,6 +1,6 @@
 {
   "name": "mui-rest-list",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "main": "lib/components/index.js",
   "types": "lib/components/index.d.ts",
   "files": [
