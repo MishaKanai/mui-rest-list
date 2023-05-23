@@ -13,6 +13,7 @@ import { withThemes } from "@react-theming/storybook-addon";
 import { ThemeProvider } from "@material-ui/core";
 import { createMuiTheme } from "@material-ui/core/styles";
 import { theme1, theme2 } from "./themes";
+import { StarWarsCharacterListWithSearch } from "./PaginatedStarWarsListWithSearch";
 
 const providerFn = ({ theme, children }: any) => {
   const serialTheme = JSON.parse(JSON.stringify(theme));
@@ -33,4 +34,4 @@ export default {
   ],
 };
 
-export { StarWarsCharacterList, ColorList, MaxCountPokemonList };
+export { StarWarsCharacterList, ColorList, MaxCountPokemonList, StarWarsCharacterListWithSearch };

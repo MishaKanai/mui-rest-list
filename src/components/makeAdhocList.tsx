@@ -175,7 +175,7 @@ const makeAdhocList = <DataShape extends {}>() => {
       );
     }
     const TableCellProps: TableCellProps | null = props.firstColumn
-      ? { component: "th", scope: "row" }
+      ? { component: "th" as any, scope: "row" }
       : null;
     const { rowData, i } = rc;
     if (props.renderdata) {
@@ -227,49 +227,94 @@ const makeAdhocList = <DataShape extends {}>() => {
         render: (elementId: string) => JSX.Element;
       };
 
+type GetDataObservableNoPag<Filter> = (params?: {
+  filter: Filter;
+}) => Observable<DataShape[]>;
+
+type GetDataObservablePag<Filter> = (params: {
+  filter: Filter;
+  size: number;
+  page: number;
+}) => Observable<{
+  data: DataShape[];
+  total: number;
+}>;
+
+type RenderFilter<Filter> = (params: {
+  filter: Filter;
+  setFilter: (filter: Filter) => void;
+  fetchData: () => void;
+}) => JSX.Element;
+
+type UnpaginatedPropsWithFilter<Filter> = {
+  initialFilter: Filter;
+  getDataObservable:  (params?: {
+    filter: Filter;
+  }) => Observable<DataShape[]>;
+  renderFilter?: RenderFilter<Filter>
+}
+type UnpaginatedProps<Filter> = {
+  type: "unpaginated";
+  renderNoResults?: (props: { refresh: () => void }) => JSX.Element;
+  getDataObservable: GetDataObservableNoPag<Filter>;
+} & (UnpaginatedPropsWithFilter<Filter> | {
+  initialFilter?: never;
+  getDataObservable: () => Observable<DataShape[]>;
+})
+
+type PaginatedPropsWithFilter<Filter> = {
+  initialFilter: Filter;
+  getDataObservable: (params: {
+    filter: Filter;
+    size: number;
+    page: number;
+  }) => Observable<{
+    data: DataShape[];
+    total: number;
+  }>;
+  renderFilter?: RenderFilter<Filter>;
+}
+type PaginatedProps<Filter> = {
+  type: "paginated";
+  pagesNIndexed: 0 | 1;
+  defaultSize: number;
+  paginationOptions?: number[] | number;
+  maxExactTotalCount?: number;
+  getDataObservable: GetDataObservablePag<Filter>;
+} & (PaginatedPropsWithFilter<Filter> | {
+  initialFilter?: never;
+  getDataObservable: (params: {
+    size: number;
+    page: number;
+  }) => Observable<{
+    data: DataShape[];
+    total: number;
+  }>;
+})
+
+type PropsWithFilter<Filter> = UnpaginatedPropsWithFilter<Filter> | PaginatedPropsWithFilter<Filter>;
+
   type AdhocListProps<
-    TitleTypographyComponent extends React.ElementType = "span"
-  > =
-    | {
-        type: "unpaginated";
-        renderNoResults?: (props: { refresh: () => void }) => JSX.Element;
-        renderBelowTitle?: () => JSX.Element;
-        titleOptions: TitleOptions<TitleTypographyComponent>;
-        hasRefresh?: boolean;
-        iconAndTextSize?: Size;
-        tableCaption: string;
-        getDataObservable: () => Observable<DataShape[]>;
-        children:
-          | React.ReactElement<AdhocListColumnProps<DataShape, any, any, any>>[]
-          | React.ReactElement<AdhocListColumnProps<DataShape, any, any, any>>;
-      }
-    | {
-        type: "paginated";
-        renderNoResults?: (props: { refresh: () => void }) => JSX.Element;
-        renderBelowTitle?: () => JSX.Element;
-        titleOptions: TitleOptions<TitleTypographyComponent>;
-        iconAndTextSize?: Size;
-        hasRefresh?: boolean;
-        pagesNIndexed: 0 | 1;
-        defaultSize: number;
-        tableCaption: string;
-        paginationOptions?: number[] | number;
-        maxExactTotalCount?: number;
-        getDataObservable: (params: {
-          size: number;
-          page: number;
-        }) => Observable<{
-          data: DataShape[];
-          total: number;
-        }>;
-        children:
-          | React.ReactElement<AdhocListColumnProps<DataShape, any, any, any>>[]
-          | React.ReactElement<AdhocListColumnProps<DataShape, any, any, any>>;
-      };
+    TitleTypographyComponent extends React.ElementType = "span",
+    Filter = never
+  > = (
+    (PaginatedProps<Filter> | UnpaginatedProps<Filter>) & {
+      renderBelowTitle?: () => JSX.Element;
+      renderNoResults?: (props: { refresh: () => void }) => JSX.Element;
+      titleOptions: TitleOptions<TitleTypographyComponent>;
+      hasRefresh?: boolean;
+      iconAndTextSize?: Size;
+      tableCaption: string;
+      children:
+        | React.ReactElement<AdhocListColumnProps<DataShape, any, any, any>>[]
+        | React.ReactElement<AdhocListColumnProps<DataShape, any, any, any>>;
+    }
+  )
   const AdhocList = <
-    TitleTypographyComponent extends React.ElementType = "span"
+    TitleTypographyComponent extends React.ElementType = "span",
+    Filter = never
   >(
-    props: AdhocListProps<TitleTypographyComponent>
+    props: AdhocListProps<TitleTypographyComponent, Filter>
   ) => {
     const { iconAndTextSize = "md", titleOptions } = props;
     const initialTitleId = useMemo(() => uniqueId("list-title-label"), []);
@@ -285,6 +330,8 @@ const makeAdhocList = <DataShape extends {}>() => {
       >
     >(initial);
 
+    const [filter, setFilter] = useState<Filter>((props as any).initialFilter)
+
     const [paginationState, dispatch] = usePagination(
       props.type === "paginated" ? props.pagesNIndexed : 0,
       props.type === "paginated" ? props.defaultSize : undefined
@@ -298,7 +345,7 @@ const makeAdhocList = <DataShape extends {}>() => {
       const subscription =
         props.type === "paginated"
           ? props
-              .getDataObservable(paginationState)
+              .getDataObservable({ ...paginationState, filter })
               .subscribe(({ data, total }) => {
                 setState(
                   success({
@@ -307,7 +354,7 @@ const makeAdhocList = <DataShape extends {}>() => {
                   })
                 );
               }, handleError)
-          : props.getDataObservable().subscribe((res) => {
+          : props.getDataObservable({ filter }).subscribe((res) => {
               setState(
                 success({
                   data: res,
@@ -322,7 +369,7 @@ const makeAdhocList = <DataShape extends {}>() => {
       };
       // eslint seems to be having trouble due to the type discrimination I'm doing.
       // (It demands I pass 'props'.) Lets just eyeball that this is correct.
-    }, [setState, props.type, props.getDataObservable, paginationState]);
+    }, [setState, props.type, props.getDataObservable, paginationState, filter]);
     useEffect(() => {
       return fetchData();
     }, [paginationState.page, paginationState.size]); // eslint-disable-line
@@ -366,6 +413,12 @@ const makeAdhocList = <DataShape extends {}>() => {
             )}
           </div>
           {props.renderBelowTitle?.() ?? null}
+          {
+            (props as PropsWithFilter<any>).renderFilter?.({
+              filter,
+              setFilter,
+              fetchData
+            }) ?? null}
           {total === 0 && props.renderNoResults ? (
             props.renderNoResults({
               refresh: fetchData,
