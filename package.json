@@ -28,7 +28,7 @@
     "@storybook/addon-links": "5.3.19",
     "@storybook/addons": "5.3.19",
     "@storybook/react": "7.0.15",
-    "@storybook/storybook-deployer": "2.8.6",
+    "@storybook/storybook-deployer": "2.8.16",
     "@storybook/theming": "5.3.19",
     "@types/jest": "26.0.7",
     "@types/node": "14.0.26",
