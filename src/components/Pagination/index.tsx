@@ -76,10 +76,10 @@ const Pagination: FunctionComponent<PaginationProps> = (props) => {
   const width = useWidth();
   const rppId = useMemo(() => uniqueId("rowsPerPage"), []);
   const mediumRPPLabelId = useRef(rppId);
-  const nbPages = useMemo(() => Math.ceil(total / perPage) || 1, [
-    total,
-    perPage,
-  ]);
+  const nbPages = useMemo(
+    () => Math.ceil(total / perPage) || 1,
+    [total, perPage]
+  );
   useEffect(() => {
     if (page < 1 || isNaN(page)) {
       setPage(1);
@@ -118,25 +118,28 @@ const Pagination: FunctionComponent<PaginationProps> = (props) => {
   const labelDisplayedRows = useCallback(
     ({ from, to, count, page }: LabelDisplayedRowsArgs) => {
       return `${from}-${to} of ${
-        beyondMaxExactTotalCount && maxExactTotalCount ? Math.max(to, maxExactTotalCount) + "+" : count
+        beyondMaxExactTotalCount && maxExactTotalCount
+          ? Math.max(to, maxExactTotalCount) + "+"
+          : count
       }`;
     },
     [beyondMaxExactTotalCount, maxExactTotalCount]
   );
 
-  const PaginationComponent = useMemo(() => {
-    // if we are not on/near the final page, and beyondMaxExactTotalCount, don't show the final pages.
+  const PaginationComponent: FunctionComponent<TablePaginationActionsProps> =
+    useMemo(() => {
+      // if we are not on/near the final page, and beyondMaxExactTotalCount, don't show the final pages.
 
-    if (
-      !beyondMaxExactTotalCount ||
-      page === nbPages - 1 ||
-      page === nbPages - 2 ||
-      page === nbPages - 3
-    ) {
-      return PaginationWithEnd;
-    }
-    return PaginationWithoutEnd;
-  }, [beyondMaxExactTotalCount, page, nbPages]);
+      if (
+        !beyondMaxExactTotalCount ||
+        page === nbPages - 1 ||
+        page === nbPages - 2 ||
+        page === nbPages - 3
+      ) {
+        return PaginationWithEnd;
+      }
+      return PaginationWithoutEnd;
+    }, [beyondMaxExactTotalCount, page, nbPages]);
 
   if (total === 0) {
     return null;

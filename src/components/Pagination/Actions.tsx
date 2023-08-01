@@ -39,10 +39,10 @@ export interface PaginationActionsProps extends TableCellProps {
   rowsPerPage: number;
 }
 
-export const PaginationActions: FunctionComponent<PaginationActionsProps & { showEndPages?: boolean; }> = (
-  props
-) => {
-  const { page, rowsPerPage, count, onChangePage, showEndPages = true } = props;
+export const PaginationActions: FunctionComponent<
+  PaginationActionsProps & { showEndPages?: boolean }
+> = (props) => {
+  const { page, rowsPerPage, count, onPageChange, showEndPages = true } = props;
 
   const classes = useStyles();
   /**
@@ -80,16 +80,16 @@ export const PaginationActions: FunctionComponent<PaginationActionsProps & { sho
     if (page < nbPages - 2) {
       input.push(nbPages);
     }
-    if (!showEndPages && page < nbPages - 4 && input.includes('.')) {
-      return input.slice(0, input.lastIndexOf('.') + 1)
+    if (!showEndPages && page < nbPages - 4 && input.includes(".")) {
+      return input.slice(0, input.lastIndexOf(".") + 1);
     }
     return input;
   }, [page, rowsPerPage, count]);
 
-  const nbPages = useMemo(() => Math.ceil(count / rowsPerPage) || 1, [
-    count,
-    rowsPerPage,
-  ]);
+  const nbPages = useMemo(
+    () => Math.ceil(count / rowsPerPage) || 1,
+    [count, rowsPerPage]
+  );
 
   const prevPage = useCallback(
     (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {

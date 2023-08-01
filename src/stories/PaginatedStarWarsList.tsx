@@ -28,9 +28,8 @@ type StarWarsPersonSearch = {
   }[];
 };
 
-const { AdhocList, AdhocListColumn } = makeAdhocList<
-  StarWarsPersonSearch["results"][0]
->();
+const { AdhocList, AdhocListColumn } =
+  makeAdhocList<StarWarsPersonSearch["results"][0]>();
 
 const getDataObservable = (params: { size: number; page: number }) =>
   ajaxGetJSON<StarWarsPersonSearch>(

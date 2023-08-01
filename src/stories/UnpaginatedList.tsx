@@ -22,7 +22,7 @@ const { AdhocList, AdhocListColumn } = makeAdhocList<ColorData>();
 export default {
   title: "AdhocList",
   component: AdhocList,
-  decorators: [withKnobs],
+  // decorators: [withKnobs],
 };
 
 const getDataObservable = (params: any) =>
@@ -96,14 +96,14 @@ export const ColorList = () => {
     <Card style={{ margin: "1em", padding: "1em" }}>
       <AdhocList
         type="unpaginated"
-        titleOptions={object("titleOptions", {
+        titleOptions={{
           type: "Typography",
           TypographyProps: {
             variant: "h4",
           },
           text: "Colors",
-        })}
-        hasRefresh={object("hasRefresh", true)}
+        }}
+        hasRefresh
         getDataObservable={getDataObservable}
         tableCaption="Colors"
       >
