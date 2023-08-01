@@ -31,7 +31,7 @@ export interface PaginationActionsProps extends TableCellProps {
   backIconButtonProps?: {};
   count: number;
   nextIconButtonProps?: {};
-  onChangePage: (
+  onPageChange: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
     page: number
   ) => void;
@@ -96,9 +96,9 @@ export const PaginationActions: FunctionComponent<PaginationActionsProps & { sho
       if (page === 0) {
         throw new Error("Cannot go before page 1");
       }
-      onChangePage(event, page - 1);
+      onPageChange(event, page - 1);
     },
-    [page, onChangePage]
+    [page, onPageChange]
   );
 
   const nextPage = useCallback(
@@ -106,9 +106,9 @@ export const PaginationActions: FunctionComponent<PaginationActionsProps & { sho
       if (page > nbPages - 1) {
         throw new Error("Cannot go after last page");
       }
-      onChangePage(event, page + 1);
+      onPageChange(event, page + 1);
     },
-    [page, nbPages, onChangePage]
+    [page, nbPages, onPageChange]
   );
 
   const gotoPage = useCallback(
@@ -117,9 +117,9 @@ export const PaginationActions: FunctionComponent<PaginationActionsProps & { sho
       if (page < 0 || page > nbPages - 1) {
         throw new Error(`Page number ${page + 1} out of boundaries`);
       }
-      onChangePage(event, page);
+      onPageChange(event, page);
     },
-    [page, nbPages, onChangePage]
+    [page, nbPages, onPageChange]
   );
   const renderPageNums = () => {
     return range.map((pageNum, index) =>

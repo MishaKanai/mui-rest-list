@@ -12,6 +12,7 @@ import TablePagination, {
 import PaginationActions, { PaginationActionsProps } from "./Actions";
 import uniqueId from "lodash.uniqueid";
 import useWidth from "../../util/useWidth";
+import { TablePaginationActionsProps } from "@material-ui/core/TablePagination/TablePaginationActions";
 
 const PaginationWithEnd = (props: PaginationActionsProps) => (
   <PaginationActions {...props} />
@@ -145,7 +146,7 @@ const Pagination: FunctionComponent<PaginationProps> = (props) => {
       count={total}
       rowsPerPage={perPage}
       page={page - 1}
-      onChangePage={handlePageChange}
+      onPageChange={handlePageChange}
       rowsPerPageOptions={emptyArray}
       component="span"
       labelDisplayedRows={labelDisplayedRows}
@@ -171,8 +172,8 @@ const Pagination: FunctionComponent<PaginationProps> = (props) => {
       count={total}
       rowsPerPage={perPage}
       page={page - 1}
-      onChangePage={handlePageChange}
-      onChangeRowsPerPage={handlePerPageChange}
+      onPageChange={handlePageChange}
+      onRowsPerPageChange={handlePerPageChange}
       ActionsComponent={PaginationComponent}
       component="span"
       // In the near future we should be able to use labelId={this.mediumRPPLabelId}
