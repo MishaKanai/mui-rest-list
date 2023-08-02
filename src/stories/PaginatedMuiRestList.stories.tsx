@@ -1,18 +1,19 @@
 import React from "react";
 import makeAdhocList from "../components/makeAdhocList";
 // @ts-ignore
-import { withKnobs, object } from "@storybook/addon-knobs/react";
+
+// import { withKnobs, object } from "@storybook/addon-knobs/react";
 import { StarWarsCharacterList } from "./PaginatedStarWarsList";
 import { MaxCountPokemonList } from "./PaginatedMaxCountPokemonList";
 import { ColorList } from "./UnpaginatedList";
-import { withInfo } from "@storybook/addon-info";
-import { withA11y } from "@storybook/addon-a11y";
+// import { withInfo } from "@storybook/addon-info";
+// import { withA11y } from "@storybook/addon-a11y.ts;
 // @ts-ignore
-import { withThemes } from "@react-theming/storybook-addon";
+// import { withThemes } from "@react-theming/storybook-addon";
 
 import { ThemeProvider } from "@material-ui/core";
 import { createMuiTheme } from "@material-ui/core/styles";
-import { theme1, theme2 } from "./themes";
+import { theme1, theme2} from "./themes"
 import { StarWarsCharacterListWithSearch } from "./PaginatedStarWarsListWithSearch";
 
 const providerFn = ({ theme, children }: any) => {
@@ -27,10 +28,10 @@ export default {
   title: "Adhoc Lists",
   component: _AdhocList,
   decorators: [
-    withKnobs,
-    withInfo,
-    withA11y,
-    withThemes(null, [theme1, theme2], { providerFn }),
+    // withKnobs,
+    // withInfo,
+    // withA11y,
+    // withThemes(null, [theme1, theme2], { providerFn }),
   ],
 };
 

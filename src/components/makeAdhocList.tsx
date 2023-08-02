@@ -70,11 +70,11 @@ const usePagination = (pagesNIndexed: 0 | 1, defaultSize: number = 10) => {
 const useStyles = makeStyles((theme) =>
   createStyles({
     headerCell: {
-      position: 'sticky',
+      position: "sticky",
       zIndex: 3,
       backgroundColor: theme.palette.background.paper,
       top: 0,
-      paddingLeft: '1em',
+      paddingLeft: "1em",
     },
     offScreen: {
       position: "absolute",
@@ -107,14 +107,14 @@ const HiddenAriaLive = <T extends any>(props: {
   );
 };
 
-export type Order = [string, 'asc' | 'desc'] | null;
+export type Order = [string, "asc" | "desc"] | null;
 
 export type GetObservableParams<Filter> = {
   orderBy?: Order;
   size?: number;
   page?: number;
   filter?: Filter;
-}
+};
 
 export interface AdHocColumnProps1<
   DataShape,
@@ -122,7 +122,7 @@ export interface AdHocColumnProps1<
 > {
   title: string;
   sortable?: boolean;
-  initialSort?: 'asc' | 'desc';
+  initialSort?: "asc" | "desc";
   hideColTitle?: boolean;
   fieldKey: FieldKey1;
   firstColumn?: boolean;
@@ -139,7 +139,7 @@ export interface AdHocColumnProps2<
 > {
   title: string;
   sortable?: boolean;
-  initialSort?: 'asc' | 'desc';
+  initialSort?: "asc" | "desc";
   hideColTitle?: boolean;
   firstColumn?: boolean;
   fieldKey: [FieldKey1, FieldKey2];
@@ -157,7 +157,7 @@ export interface AdHocColumnProps3<
 > {
   title: string;
   sortable?: boolean;
-  initialSort?: 'asc' | 'desc';
+  initialSort?: "asc" | "desc";
   hideColTitle?: boolean;
   firstColumn?: boolean;
   fieldKey: [FieldKey1, FieldKey2, FieldKey3];
@@ -217,12 +217,16 @@ const makeAdhocList = <DataShape extends {}>() => {
       return resultElement;
     }
     const fieldData = get(rowData, props.fieldKey);
-    const tableHeadingCellChildren = (
+    const tableHeadingCellChildren =
       typeof fieldData === "string" || typeof fieldData === "number"
-    ) ? fieldData : typeof fieldData === "object" ? 'Unhandled Object Type' : undefined;
-    
-      return <TableCell {...TableCellProps}>{tableHeadingCellChildren}</TableCell>;
-    
+        ? fieldData
+        : typeof fieldData === "object"
+        ? "Unhandled Object Type"
+        : undefined;
+
+    return (
+      <TableCell {...TableCellProps}>{tableHeadingCellChildren}</TableCell>
+    );
   };
   type TitleOptions<
     TitleTypographyComponent extends React.ElementType = "span"
@@ -249,86 +253,84 @@ const makeAdhocList = <DataShape extends {}>() => {
         render: (elementId: string) => JSX.Element;
       };
 
-  
-type RenderFilter<Filter> = (params: {
-  filter: Filter;
-  setFilter: (filter: Filter) => void;
-  fetchData: () => void;
-}) => JSX.Element;
-
-// All unpaginated props
-type UnpaginatedPropsWithFilter<Filter> = {
-  initialFilter: Filter;
-  getDataObservable:  (params?: {
+  type RenderFilter<Filter> = (params: {
     filter: Filter;
-    orderBy?: Order;
-  }) => Observable<DataShape[]>;
-  renderFilter?: RenderFilter<Filter>
-}
-type UnpaginatedPropsWithoutFilter = {
-  initialFilter?: never;
-  getDataObservable: (params?: {
-    orderBy?: Order;
-  }) => Observable<DataShape[]>;
-}
-type UnpaginatedProps<Filter> = {
-  type: "unpaginated";
-  renderNoResults?: (props: { refresh: () => void }) => JSX.Element;
-} & (UnpaginatedPropsWithFilter<Filter> | UnpaginatedPropsWithoutFilter)
+    setFilter: (filter: Filter) => void;
+    fetchData: () => void;
+  }) => JSX.Element;
 
-// all Paginated props
-type PaginatedPropsWithFilter<Filter> = {
-  initialFilter: Filter;
-  getDataObservable: (params: {
-    orderBy?: Order;
-    filter: Filter;
-    size: number;
-    page: number;
-  }) => Observable<{
-    data: DataShape[];
-    total: number;
-  }>;
-  renderFilter?: RenderFilter<Filter>;
-}
-type PaginatedPropsWithoutFilter = {
-  initialFilter?: never;
-  getDataObservable: (params: {
-    orderBy?: Order;
-    size: number;
-    page: number;
-  }) => Observable<{
-    data: DataShape[];
-    total: number;
-  }>
-}
-type PaginatedProps<Filter> = {
-  type: "paginated";
-  pagesNIndexed: 0 | 1;
-  defaultSize: number;
-  paginationOptions?: number[] | number;
-  maxExactTotalCount?: number;
-} & (PaginatedPropsWithFilter<Filter> | PaginatedPropsWithoutFilter);
+  // All unpaginated props
+  type UnpaginatedPropsWithFilter<Filter> = {
+    initialFilter: Filter;
+    getDataObservable: (params?: {
+      filter: Filter;
+      orderBy?: Order;
+    }) => Observable<DataShape[]>;
+    renderFilter?: RenderFilter<Filter>;
+  };
+  type UnpaginatedPropsWithoutFilter = {
+    initialFilter?: never;
+    getDataObservable: (params?: {
+      orderBy?: Order;
+    }) => Observable<DataShape[]>;
+  };
+  type UnpaginatedProps<Filter> = {
+    type: "unpaginated";
+    renderNoResults?: (props: { refresh: () => void }) => JSX.Element;
+  } & (UnpaginatedPropsWithFilter<Filter> | UnpaginatedPropsWithoutFilter);
 
-// all props with filter
-type PropsWithFilter<Filter> = UnpaginatedPropsWithFilter<Filter> | PaginatedPropsWithFilter<Filter>;
+  // all Paginated props
+  type PaginatedPropsWithFilter<Filter> = {
+    initialFilter: Filter;
+    getDataObservable: (params: {
+      orderBy?: Order;
+      filter: Filter;
+      size: number;
+      page: number;
+    }) => Observable<{
+      data: DataShape[];
+      total: number;
+    }>;
+    renderFilter?: RenderFilter<Filter>;
+  };
+  type PaginatedPropsWithoutFilter = {
+    initialFilter?: never;
+    getDataObservable: (params: {
+      orderBy?: Order;
+      size: number;
+      page: number;
+    }) => Observable<{
+      data: DataShape[];
+      total: number;
+    }>;
+  };
+  type PaginatedProps<Filter> = {
+    type: "paginated";
+    pagesNIndexed: 0 | 1;
+    defaultSize: number;
+    paginationOptions?: number[] | number;
+    maxExactTotalCount?: number;
+  } & (PaginatedPropsWithFilter<Filter> | PaginatedPropsWithoutFilter);
 
+  // all props with filter
+  type PropsWithFilter<Filter> =
+    | UnpaginatedPropsWithFilter<Filter>
+    | PaginatedPropsWithFilter<Filter>;
 
   type AdhocListProps<
     TitleTypographyComponent extends React.ElementType = "span",
     Filter = never
-  > = (
-    (PaginatedProps<Filter> | UnpaginatedProps<Filter>) & {
-      renderBelowTitle?: () => JSX.Element;
-      renderNoResults?: (props: { refresh: () => void }) => JSX.Element;
-      titleOptions: TitleOptions<TitleTypographyComponent>;
-      hasRefresh?: boolean;
-      iconAndTextSize?: Size;
-      tableCaption: string;
-      children:
-        | React.ReactElement<AdhocListColumnProps<DataShape, any, any, any>>[]
-        | React.ReactElement<AdhocListColumnProps<DataShape, any, any, any>>;
-    }
-  )
+  > = (PaginatedProps<Filter> | UnpaginatedProps<Filter>) & {
+    renderBelowTitle?: () => JSX.Element;
+    renderNoResults?: (props: { refresh: () => void }) => JSX.Element;
+    titleOptions: TitleOptions<TitleTypographyComponent>;
+    hasRefresh?: boolean;
+    iconAndTextSize?: Size;
+    tableCaption: string;
+    children:
+      | React.ReactElement<AdhocListColumnProps<DataShape, any, any, any>>[]
+      | React.ReactElement<AdhocListColumnProps<DataShape, any, any, any>>;
+  };
   const AdhocList = <
     TitleTypographyComponent extends React.ElementType = "span",
     Filter = never
@@ -336,7 +338,7 @@ type PropsWithFilter<Filter> = UnpaginatedPropsWithFilter<Filter> | PaginatedPro
     props: AdhocListProps<TitleTypographyComponent, Filter>
   ) => {
     const { iconAndTextSize = "md", titleOptions } = props;
-    const sortCaptionId = useMemo(() => uniqueId('sort-caption-'), []);
+    const sortCaptionId = useMemo(() => uniqueId("sort-caption-"), []);
     const initialTitleId = useMemo(() => uniqueId("list-title-label"), []);
     const titleId = useRef(initialTitleId);
     const classes = useStyles();
@@ -350,23 +352,29 @@ type PropsWithFilter<Filter> = UnpaginatedPropsWithFilter<Filter> | PaginatedPro
       >
     >(initial);
 
-    const [filter, setFilter] = useState<Filter>((props as any).initialFilter)
+    const [filter, setFilter] = useState<Filter>((props as any).initialFilter);
 
     const [paginationState, dispatch] = usePagination(
       props.type === "paginated" ? props.pagesNIndexed : 0,
       props.type === "paginated" ? props.defaultSize : undefined
     );
 
-    const initialSort: Order | null = useMemo(() => (props.children && !Array.isArray(props.children) ?
-    [props.children] : props.children ?? []).flatMap(child => {
-      const initialSort = child.props.initialSort;
-      if (!initialSort) {
-        return []
-      }
-      return [[child.props.fieldKey, initialSort] as Order]
-    })[0] ?? null, [props.children]);
-    
-  const [order, setOrder] = useState<Order>(initialSort);
+    const initialSort: Order | null = useMemo(
+      () =>
+        (props.children && !Array.isArray(props.children)
+          ? [props.children]
+          : props.children ?? []
+        ).flatMap((child) => {
+          const initialSort = child.props.initialSort;
+          if (!initialSort) {
+            return [];
+          }
+          return [[child.props.fieldKey, initialSort] as Order];
+        })[0] ?? null,
+      [props.children]
+    );
+
+    const [order, setOrder] = useState<Order>(initialSort);
 
     const fetchData = useCallback(() => {
       const handleError = (error: AjaxError) => {
@@ -385,14 +393,16 @@ type PropsWithFilter<Filter> = UnpaginatedPropsWithFilter<Filter> | PaginatedPro
                   })
                 );
               }, handleError)
-          : props.getDataObservable({ filter, orderBy: order }).subscribe((res) => {
-              setState(
-                success({
-                  data: res,
-                  total: res.length,
-                })
-              );
-            }, handleError);
+          : props
+              .getDataObservable({ filter, orderBy: order })
+              .subscribe((res) => {
+                setState(
+                  success({
+                    data: res,
+                    total: res.length,
+                  })
+                );
+              }, handleError);
       return () => {
         if (!subscription.closed) {
           subscription.unsubscribe();
@@ -400,7 +410,14 @@ type PropsWithFilter<Filter> = UnpaginatedPropsWithFilter<Filter> | PaginatedPro
       };
       // eslint seems to be having trouble due to the type discrimination I'm doing.
       // (It demands I pass 'props'.) Lets just eyeball that this is correct.
-    }, [setState, props.type, props.getDataObservable, paginationState, filter, order]);
+    }, [
+      setState,
+      props.type,
+      props.getDataObservable,
+      paginationState,
+      filter,
+      order,
+    ]);
     useEffect(() => {
       return fetchData();
     }, [paginationState.page, paginationState.size, order?.[0], order?.[1]]); // eslint-disable-line
@@ -419,8 +436,14 @@ type PropsWithFilter<Filter> = UnpaginatedPropsWithFilter<Filter> | PaginatedPro
         "aria-label": titleOptions.text,
       };
     }, []);
-    const containsSomeSort = useMemo(() => (props.children && !Array.isArray(props.children) ?
-      [props.children] : props.children)?.some(f => f.props.sortable !== false), [props.children]);
+    const containsSomeSort = useMemo(
+      () =>
+        (props.children && !Array.isArray(props.children)
+          ? [props.children]
+          : props.children
+        )?.some((f) => f.props.sortable !== false),
+      [props.children]
+    );
     const renderTable = (state: { data: DataShape[]; total: number }) => {
       const { data, total } = state;
       return (
@@ -446,12 +469,11 @@ type PropsWithFilter<Filter> = UnpaginatedPropsWithFilter<Filter> | PaginatedPro
             )}
           </div>
           {props.renderBelowTitle?.() ?? null}
-          {
-            (props as PropsWithFilter<any>).renderFilter?.({
-              filter,
-              setFilter,
-              fetchData
-            }) ?? null}
+          {(props as PropsWithFilter<any>).renderFilter?.({
+            filter,
+            setFilter,
+            fetchData,
+          }) ?? null}
           {total === 0 && props.renderNoResults ? (
             props.renderNoResults({
               refresh: fetchData,
@@ -461,61 +483,72 @@ type PropsWithFilter<Filter> = UnpaginatedPropsWithFilter<Filter> | PaginatedPro
               <caption className={classes.offScreen}>
                 {props.tableCaption}
                 {containsSomeSort && (
-                    <span id={sortCaptionId}>, use column header buttons to sort</span>
+                  <span id={sortCaptionId}>
+                    , use column header buttons to sort
+                  </span>
                 )}
               </caption>
               <TableHead>
                 <TableRow>
                   {React.Children.map(props.children, (c, i) => {
-                    const title = c.props.hideColTitle ? <span className={classes.offScreen}>
-                      {c.props.title}
-                    </span> : c.props.title;
+                    const title = c.props.hideColTitle ? (
+                      <span className={classes.offScreen}>{c.props.title}</span>
+                    ) : (
+                      c.props.title
+                    );
 
                     if (c.props.sortable) {
-                      return <TableCell
-                        className={classes.headerCell}
-                        padding="none"
-                        sortDirection={
-                          order?.[0] === c.props.fieldKey ? order?.[1] : false
-                        }
-                        // align={field.props.cellAlign}
-                    >
-                        <Tooltip title="Sort" enterDelay={300}>
+                      return (
+                        <TableCell
+                          className={classes.headerCell}
+                          padding="none"
+                          sortDirection={
+                            order?.[0] === c.props.fieldKey ? order?.[1] : false
+                          }
+                          // align={field.props.cellAlign}
+                        >
+                          <Tooltip title="Sort" enterDelay={300}>
                             <SortLabel
-                                ButtonProps={{
-                                    onClick: e => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      const selectedFieldKey = c.props.fieldKey;
-                                      setOrder(currOrder => {
-                                        const fieldPath = Array.isArray(selectedFieldKey) ?
-                                          selectedFieldKey.join('.') : selectedFieldKey;
-                                        if (!currOrder) {
-                                          return [fieldPath, 'asc']
-                                        }
-                                        const [currField, currDir] = currOrder;
-                                        if (currField === fieldPath) {
-                                          return [
-                                            currField,
-                                            currDir === 'asc' ? 'desc' : 'asc'
-                                          ]
-                                        }
-                                        return [fieldPath, 'asc'];
-                                      })
-                                    },
-                                    'aria-describedby': sortCaptionId,
-                                }}
-                                label={title}
-                                active={order ? order[0] === c.props.fieldKey : undefined}
-                                direction={order?.[1]}                            />
-                        </Tooltip>
-                    </TableCell>
+                              ButtonProps={{
+                                onClick: (e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  const selectedFieldKey = c.props.fieldKey;
+                                  setOrder((currOrder) => {
+                                    const fieldPath = Array.isArray(
+                                      selectedFieldKey
+                                    )
+                                      ? selectedFieldKey.join(".")
+                                      : selectedFieldKey;
+                                    if (!currOrder) {
+                                      return [fieldPath, "asc"];
+                                    }
+                                    const [currField, currDir] = currOrder;
+                                    if (currField === fieldPath) {
+                                      return [
+                                        currField,
+                                        currDir === "asc" ? "desc" : "asc",
+                                      ];
+                                    }
+                                    return [fieldPath, "asc"];
+                                  });
+                                },
+                                "aria-describedby": sortCaptionId,
+                              }}
+                              label={title}
+                              active={
+                                order
+                                  ? order[0] === c.props.fieldKey
+                                  : undefined
+                              }
+                              direction={order?.[1]}
+                            />
+                          </Tooltip>
+                        </TableCell>
+                      );
                     }
-                    return <TableCell key={i}>
-                      {title}
-                    </TableCell>
-                  }
-                  )}
+                    return <TableCell key={i}>{title}</TableCell>;
+                  })}
                 </TableRow>
               </TableHead>
               <TableBody>

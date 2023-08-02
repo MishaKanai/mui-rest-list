@@ -31,7 +31,7 @@ export interface PaginationActionsProps extends TableCellProps {
   backIconButtonProps?: {};
   count: number;
   nextIconButtonProps?: {};
-  onChangePage: (
+  onPageChange: (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
     page: number
   ) => void;
@@ -39,10 +39,10 @@ export interface PaginationActionsProps extends TableCellProps {
   rowsPerPage: number;
 }
 
-export const PaginationActions: FunctionComponent<PaginationActionsProps & { showEndPages?: boolean; }> = (
-  props
-) => {
-  const { page, rowsPerPage, count, onChangePage, showEndPages = true } = props;
+export const PaginationActions: FunctionComponent<
+  PaginationActionsProps & { showEndPages?: boolean }
+> = (props) => {
+  const { page, rowsPerPage, count, onPageChange, showEndPages = true } = props;
 
   const classes = useStyles();
   /**
@@ -80,25 +80,25 @@ export const PaginationActions: FunctionComponent<PaginationActionsProps & { sho
     if (page < nbPages - 2) {
       input.push(nbPages);
     }
-    if (!showEndPages && page < nbPages - 4 && input.includes('.')) {
-      return input.slice(0, input.lastIndexOf('.') + 1)
+    if (!showEndPages && page < nbPages - 4 && input.includes(".")) {
+      return input.slice(0, input.lastIndexOf(".") + 1);
     }
     return input;
   }, [page, rowsPerPage, count]);
 
-  const nbPages = useMemo(() => Math.ceil(count / rowsPerPage) || 1, [
-    count,
-    rowsPerPage,
-  ]);
+  const nbPages = useMemo(
+    () => Math.ceil(count / rowsPerPage) || 1,
+    [count, rowsPerPage]
+  );
 
   const prevPage = useCallback(
     (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       if (page === 0) {
         throw new Error("Cannot go before page 1");
       }
-      onChangePage(event, page - 1);
+      onPageChange(event, page - 1);
     },
-    [page, onChangePage]
+    [page, onPageChange]
   );
 
   const nextPage = useCallback(
@@ -106,9 +106,9 @@ export const PaginationActions: FunctionComponent<PaginationActionsProps & { sho
       if (page > nbPages - 1) {
         throw new Error("Cannot go after last page");
       }
-      onChangePage(event, page + 1);
+      onPageChange(event, page + 1);
     },
-    [page, nbPages, onChangePage]
+    [page, nbPages, onPageChange]
   );
 
   const gotoPage = useCallback(
@@ -117,9 +117,9 @@ export const PaginationActions: FunctionComponent<PaginationActionsProps & { sho
       if (page < 0 || page > nbPages - 1) {
         throw new Error(`Page number ${page + 1} out of boundaries`);
       }
-      onChangePage(event, page);
+      onPageChange(event, page);
     },
-    [page, nbPages, onChangePage]
+    [page, nbPages, onPageChange]
   );
   const renderPageNums = () => {
     return range.map((pageNum, index) =>
