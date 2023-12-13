@@ -322,6 +322,7 @@ const makeAdhocList = <DataShape extends {}>() => {
     Filter = never
   > = (PaginatedProps<Filter> | UnpaginatedProps<Filter>) & {
     renderBelowTitle?: () => JSX.Element;
+    TopRightAction?: React.ReactNode;
     renderNoResults?: (props: { refresh: () => void }) => JSX.Element;
     titleOptions: TitleOptions<TitleTypographyComponent>;
     hasRefresh?: boolean;
@@ -460,13 +461,16 @@ const makeAdhocList = <DataShape extends {}>() => {
               titleOptions.type === "aria-label" ? null : (
               titleOptions.render(titleId.current)
             )}
-            {props.hasRefresh && (
-              <div>
-                <IconButton aria-label="Refresh" onClick={fetchData}>
-                  <Refresh />
-                </IconButton>
-              </div>
-            )}
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <div>{props.TopRightAction ?? null}</div>
+              {props.hasRefresh && (
+                <div>
+                  <IconButton aria-label="Refresh" onClick={fetchData}>
+                    <Refresh />
+                  </IconButton>
+                </div>
+              )}
+            </div>
           </div>
           {props.renderBelowTitle?.() ?? null}
           {(props as PropsWithFilter<any>).renderFilter?.({
