@@ -461,7 +461,13 @@ const makeAdhocList = <DataShape extends {}>() => {
               titleOptions.type === "aria-label" ? null : (
               titleOptions.render(titleId.current)
             )}
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
               <div>{props.TopRightAction ?? null}</div>
               {props.hasRefresh && (
                 <div>
