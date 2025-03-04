@@ -120,7 +120,7 @@ export interface AdHocColumnProps1<
   DataShape,
   FieldKey1 extends keyof DataShape
 > {
-  title: string;
+  title: string | JSX.Element;
   sortable?: boolean;
   initialSort?: "asc" | "desc";
   hideColTitle?: boolean;
@@ -137,7 +137,7 @@ export interface AdHocColumnProps2<
   FieldKey1 extends keyof DataShape,
   FieldKey2 extends keyof DataShape[FieldKey1]
 > {
-  title: string;
+  title: string | JSX.Element;
   sortable?: boolean;
   initialSort?: "asc" | "desc";
   hideColTitle?: boolean;
@@ -155,7 +155,7 @@ export interface AdHocColumnProps3<
   FieldKey2 extends keyof DataShape[FieldKey1],
   FieldKey3 extends keyof DataShape[FieldKey1][FieldKey2]
 > {
-  title: string;
+  title: string | JSX.Element;
   sortable?: boolean;
   initialSort?: "asc" | "desc";
   hideColTitle?: boolean;
