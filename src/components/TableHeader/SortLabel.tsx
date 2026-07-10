@@ -14,6 +14,8 @@ const useStyles = makeStyles((theme) =>
       display: "inline-grid",
     },
     sortButton: {
+      fontSize: "inherit",
+      fontFamily: "inherit",
       "&:focus": {
         color: theme.palette.text.secondary,
       },
