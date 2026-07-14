@@ -76,6 +76,11 @@ const useStyles = makeStyles((theme) =>
       top: 0,
       paddingLeft: "1em",
     },
+    nonSortableHeaderLabel: {
+      display: "inline-flex",
+      verticalAlign: "middle",
+      lineHeight: "normal",
+    },
     offScreen: {
       position: "absolute",
       left: "-10000px",
@@ -557,7 +562,17 @@ const makeAdhocList = <DataShape extends {}>() => {
                         </TableCell>
                       );
                     }
-                    return <TableCell key={i}>{title}</TableCell>;
+                    return (
+                      <TableCell
+                        key={i}
+                        className={classes.headerCell}
+                        padding="none"
+                      >
+                        <span className={classes.nonSortableHeaderLabel}>
+                          <b>{title}</b>
+                        </span>
+                      </TableCell>
+                    );
                   })}
                 </TableRow>
               </TableHead>
