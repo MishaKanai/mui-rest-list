@@ -11,14 +11,14 @@ import { ColorList } from "./UnpaginatedList";
 // @ts-ignore
 // import { withThemes } from "@react-theming/storybook-addon";
 
-import { ThemeProvider } from "@material-ui/core";
-import { createMuiTheme } from "@material-ui/core/styles";
+import { ThemeProvider } from "@mui/material/styles";
+import { createTheme } from "@mui/material/styles";
 import { theme1, theme2} from "./themes"
 import { StarWarsCharacterListWithSearch } from "./PaginatedStarWarsListWithSearch";
 
 const providerFn = ({ theme, children }: any) => {
   const serialTheme = JSON.parse(JSON.stringify(theme));
-  const muTheme = createMuiTheme(serialTheme);
+  const muTheme = createTheme(serialTheme);
   return <ThemeProvider theme={muTheme}>{children}</ThemeProvider>;
 };
 

@@ -14,14 +14,12 @@ import {
   TableCell,
   TableBody,
   IconButton,
-  createStyles,
-  makeStyles,
   Typography,
   TypographyProps,
   TableProps,
   TableCellProps,
   Tooltip,
-} from "@material-ui/core";
+} from "@mui/material";
 import { Observable } from "rxjs";
 import {
   initial,
@@ -32,7 +30,7 @@ import {
   fold,
 } from "@devexperts/remote-data-ts";
 import { AjaxError } from "rxjs/ajax";
-import Refresh from "@material-ui/icons/Refresh";
+import Refresh from "@mui/icons-material/Refresh";
 // import Pagination from "components/generics/genericList/RaPagination";
 import get from "lodash.get";
 import { Size, NetworkUnavailable, ServerError, Pending } from "./states";
@@ -67,38 +65,37 @@ const usePagination = (pagesNIndexed: 0 | 1, defaultSize: number = 10) => {
   return [paginationState, dispatch] as const;
 };
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    headerCell: {
-      position: "sticky",
-      zIndex: 3,
-      backgroundColor: theme.palette.background.paper,
-      top: 0,
-      paddingLeft: "1em",
-    },
-    nonSortableHeaderLabel: {
-      display: "inline-flex",
-      verticalAlign: "middle",
-      lineHeight: "normal",
-    },
-    offScreen: {
-      position: "absolute",
-      left: "-10000px",
-      top: "auto",
-      height: 0,
-      width: 0,
-      overflow: "hidden",
-    },
-  })
-);
+// v2 (MUI v5): the JSS sheet is gone. Theme-reading rules moved to `sx` on the MUI hosts;
+// static rules on plain HTML elements became inline style objects (the v1 class names were
+// JSS-hashed, so nothing external could have targeted them).
+const headerCellSx = {
+  position: "sticky",
+  zIndex: 3,
+  backgroundColor: "background.paper",
+  top: 0,
+  // wins over the cell's own `padding="none"` rule: sx inserts after component styles.
+  paddingLeft: "1em",
+} as const;
+const nonSortableHeaderLabelStyle: React.CSSProperties = {
+  display: "inline-flex",
+  verticalAlign: "middle",
+  lineHeight: "normal",
+};
+const offScreenStyle: React.CSSProperties = {
+  position: "absolute",
+  left: "-10000px",
+  top: "auto",
+  height: 0,
+  width: 0,
+  overflow: "hidden",
+};
 const HiddenAriaLive = <T extends any>(props: {
   remoteData: RemoteData<AjaxError, { data: T[]; total: number }>;
   resourceDisplayName?: string;
 }) => {
   const { remoteData, resourceDisplayName = "Results" } = props;
-  const classes = useStyles();
   return (
-    <span aria-live="polite" aria-atomic="true" className={classes.offScreen}>
+    <span aria-live="polite" aria-atomic="true" style={offScreenStyle}>
       {fold<AjaxError, { data: T[]; total: number }, string>(
         () => "",
         () => "loading",
@@ -215,8 +212,12 @@ const makeAdhocList = <DataShape extends {}>() => {
       );
       if (resultElement.type !== TableCell) {
         throw new Error(
-          `render prop on AdhocListColumn must return a <TableCell> element
-          (Also ensure you are using a matching version of @material-ui/core)`
+          `render prop on AdhocListColumn must return a <TableCell> element.
+          As of mui-rest-list 2.x that means @mui/material's TableCell (v5) — the same module
+          instance this library resolves through its peer dependency. If your bundler or package
+          manager might duplicate @mui/material, import the cell from this library instead:
+          import { AdhocListTableCell } from "mui-rest-list".
+          (On mui-rest-list 1.x, return @material-ui/core's v4 TableCell.)`
         );
       }
       return resultElement;
@@ -347,7 +348,6 @@ const makeAdhocList = <DataShape extends {}>() => {
     const sortCaptionId = useMemo(() => uniqueId("sort-caption-"), []);
     const initialTitleId = useMemo(() => uniqueId("list-title-label"), []);
     const titleId = useRef(initialTitleId);
-    const classes = useStyles();
     const [state, setState] = useState<
       RemoteData<
         AjaxError,
@@ -495,7 +495,7 @@ const makeAdhocList = <DataShape extends {}>() => {
             })
           ) : (
             <Table {...TableProps}>
-              <caption className={classes.offScreen}>
+              <caption style={offScreenStyle}>
                 {props.tableCaption}
                 {containsSomeSort && (
                   <span id={sortCaptionId}>
@@ -507,7 +507,7 @@ const makeAdhocList = <DataShape extends {}>() => {
                 <TableRow>
                   {React.Children.map(props.children, (c, i) => {
                     const title = c.props.hideColTitle ? (
-                      <span className={classes.offScreen}>{c.props.title}</span>
+                      <span style={offScreenStyle}>{c.props.title}</span>
                     ) : (
                       c.props.title
                     );
@@ -515,7 +515,7 @@ const makeAdhocList = <DataShape extends {}>() => {
                     if (c.props.sortable) {
                       return (
                         <TableCell
-                          className={classes.headerCell}
+                          sx={headerCellSx}
                           padding="none"
                           sortDirection={
                             order?.[0] === c.props.fieldKey ? order?.[1] : false
@@ -563,12 +563,8 @@ const makeAdhocList = <DataShape extends {}>() => {
                       );
                     }
                     return (
-                      <TableCell
-                        key={i}
-                        className={classes.headerCell}
-                        padding="none"
-                      >
-                        <span className={classes.nonSortableHeaderLabel}>
+                      <TableCell key={i} sx={headerCellSx} padding="none">
+                        <span style={nonSortableHeaderLabelStyle}>
                           <b>{title}</b>
                         </span>
                       </TableCell>

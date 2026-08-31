@@ -3,28 +3,26 @@
     https://github.com/marmelab/react-admin
 */
 import React, { FunctionComponent, useMemo, useCallback } from "react";
-import Button from "@material-ui/core/Button";
-import { createStyles, makeStyles } from "@material-ui/core/styles";
-import ChevronLeft from "@material-ui/icons/ChevronLeft";
-import ChevronRight from "@material-ui/icons/ChevronRight";
-import TableCell from "@material-ui/core/TableCell";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import ChevronLeft from "@mui/icons-material/ChevronLeft";
+import ChevronRight from "@mui/icons-material/ChevronRight";
+import TableCell from "@mui/material/TableCell";
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    offScreen: {
-      position: "absolute",
-      left: "-10000px",
-      top: "auto",
-      overflow: "hidden",
-    },
-    actions: {
-      flexShrink: 0,
-      color: theme.palette.text.secondary,
-      marginLeft: 20,
-    },
-    hellip: { padding: "1.2em" },
-  })
-);
+// v2 (MUI v5): the JSS sheet is gone — the theme-reading `actions` rule became `sx` on a Box
+// (same rendered div), the static rules became inline styles.
+const offScreenStyle: React.CSSProperties = {
+  position: "absolute",
+  left: "-10000px",
+  top: "auto",
+  overflow: "hidden",
+};
+const actionsSx = {
+  flexShrink: 0,
+  color: "text.secondary",
+  marginLeft: "20px",
+} as const;
+const hellipStyle: React.CSSProperties = { padding: "1.2em" };
 
 interface TableCellProps extends React.ComponentProps<typeof TableCell> {}
 export interface PaginationActionsProps extends TableCellProps {
@@ -43,8 +41,6 @@ export const PaginationActions: FunctionComponent<
   PaginationActionsProps & { showEndPages?: boolean }
 > = (props) => {
   const { page, rowsPerPage, count, onPageChange, showEndPages = true } = props;
-
-  const classes = useStyles();
   /**
    * Warning: material-ui's page is 0-based
    */
@@ -124,29 +120,31 @@ export const PaginationActions: FunctionComponent<
   const renderPageNums = () => {
     return range.map((pageNum, index) =>
       pageNum === "." ? (
-        <span key={`hyphen_${index}`} className={classes.hellip}>
+        <span key={`hyphen_${index}`} style={hellipStyle}>
           &hellip;
         </span>
       ) : (
         <Button
           className="page-number"
-          color={pageNum === page + 1 ? "default" : "primary"}
+          // v5 removed color="default"; "inherit" renders the same neutral text button the
+          // current-page number had under v4.
+          color={pageNum === page + 1 ? "inherit" : "primary"}
           key={pageNum}
           data-page={pageNum - 1}
           onClick={gotoPage}
           size="small"
         >
-          <span className={classes.offScreen}>Page </span>
+          <span style={offScreenStyle}>Page </span>
           {pageNum}
         </Button>
       )
     );
   };
   if (nbPages === 1) {
-    return <div className={classes.actions} />;
+    return <Box sx={actionsSx} />;
   }
   return (
-    <div className={classes.actions}>
+    <Box sx={actionsSx}>
       {page > 0 && (
         <Button
           color="primary"
@@ -172,7 +170,7 @@ export const PaginationActions: FunctionComponent<
           <ChevronRight />
         </Button>
       )}
-    </div>
+    </Box>
   );
 };
 

@@ -2,7 +2,7 @@ import React from "react";
 import makeAdhocList from "../components/makeAdhocList";
 import { delay, map } from "rxjs/operators";
 import { ajaxGetJSON } from "rxjs/internal/observable/dom/AjaxObservable";
-import { Card } from "@material-ui/core";
+import { Card } from "@mui/material";
 
 type PokemonSearch = {
   count: number;

@@ -1,63 +1,38 @@
 import React, { FunctionComponent } from "react";
-import {
-  CircularProgress,
-  createStyles,
-  makeStyles,
-  SvgIconProps,
-  Typography,
-} from "@material-ui/core";
-import CloudOff from "@material-ui/icons/CloudOff";
-import Error from "@material-ui/icons/Error";
+import { CircularProgress, SvgIconProps, Typography } from "@mui/material";
+import CloudOff from "@mui/icons-material/CloudOff";
+import Error from "@mui/icons-material/Error";
 
-export const useStyles = makeStyles((theme) =>
-  createStyles({
-    root: (props: { size: Size }) => ({
-      width: "100%",
-      height: "100%",
-      minHeight:
-        props.size === "lg" ? "300px" : props.size === "md" ? "200px" : "100px",
-      position: "relative",
-    }),
-    centerArea: {
-      position: "absolute",
-      left: "50%",
-      top: "50%",
-      transform: "translate(-50%, -50%)",
-      textAlign: "center",
-    },
-    iconLg: {
-      height: 200,
-      width: 200,
-    },
-    iconMd: {
-      height: 100,
-      width: 100,
-    },
-    iconSm: {
-      height: 50,
-      width: 50,
-    },
-  })
-);
+// v2 (MUI v5): the JSS sheet (including its props-dependent `root` rule) is gone — none of
+// the rules read the theme, so they became inline style objects on the same elements.
+const rootStyle = (size: Size): React.CSSProperties => ({
+  width: "100%",
+  height: "100%",
+  minHeight: size === "lg" ? "300px" : size === "md" ? "200px" : "100px",
+  position: "relative",
+});
+const centerAreaStyle: React.CSSProperties = {
+  position: "absolute",
+  left: "50%",
+  top: "50%",
+  transform: "translate(-50%, -50%)",
+  textAlign: "center",
+};
+const iconStyles: Record<Size, React.CSSProperties> = {
+  lg: { height: 200, width: 200 },
+  md: { height: 100, width: 100 },
+  sm: { height: 50, width: 50 },
+};
 
 export type Size = "sm" | "md" | "lg";
 interface PendingProps {
   size: Size;
 }
 export const Pending: FunctionComponent<PendingProps> = ({ size }) => {
-  const classes = useStyles({ size });
   return (
-    <div className={classes.root}>
-      <div className={classes.centerArea}>
-        <CircularProgress
-          className={
-            size === "sm"
-              ? classes.iconSm
-              : size === "md"
-              ? classes.iconMd
-              : classes.iconLg
-          }
-        />
+    <div style={rootStyle(size)}>
+      <div style={centerAreaStyle}>
+        <CircularProgress style={iconStyles[size]} />
       </div>
     </div>
   );
@@ -71,19 +46,10 @@ interface BaseErrorProps {
 }
 export const BaseError: React.FunctionComponent<BaseErrorProps> = (props) => {
   const { retry, Icon, headingText, subText, size } = props;
-  const classes = useStyles({ size });
   return (
-    <div className={classes.root}>
-      <div className={classes.centerArea}>
-        <Icon
-          className={
-            size === "lg"
-              ? classes.iconLg
-              : size == "md"
-              ? classes.iconMd
-              : classes.iconSm
-          }
-        />
+    <div style={rootStyle(size)}>
+      <div style={centerAreaStyle}>
+        <Icon style={iconStyles[size]} />
         {headingText && (
           <Typography
             variant={size === "sm" ? "h3" : size === "md" ? "h4" : "h5"}
