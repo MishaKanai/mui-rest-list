@@ -4,7 +4,7 @@ import { of } from "rxjs";
 import { delay, map } from "rxjs/operators";
 // @ts-ignore
 import { withKnobs, object } from "@storybook/addon-knobs/react";
-import { TableCell, Card } from "@material-ui/core";
+import { TableCell, Card } from "@mui/material";
 import orderBy from 'lodash/orderBy';
 
 type ColorData = {

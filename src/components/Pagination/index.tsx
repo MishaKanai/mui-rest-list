@@ -8,11 +8,11 @@ import React, {
 } from "react";
 import TablePagination, {
   LabelDisplayedRowsArgs,
-} from "@material-ui/core/TablePagination";
+} from "@mui/material/TablePagination";
 import PaginationActions, { PaginationActionsProps } from "./Actions";
 import uniqueId from "lodash.uniqueid";
 import useWidth from "../../util/useWidth";
-import { TablePaginationActionsProps } from "@material-ui/core/TablePagination/TablePaginationActions";
+import { TablePaginationActionsProps } from "@mui/material/TablePagination/TablePaginationActions";
 
 const PaginationWithEnd = (props: PaginationActionsProps) => (
   <PaginationActions {...props} />

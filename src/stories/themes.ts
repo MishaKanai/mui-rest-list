@@ -1,14 +1,15 @@
-import { createMuiTheme } from "@material-ui/core/styles";
-import { pink } from "@material-ui/core/colors";
+import { createTheme } from "@mui/material/styles";
+import { pink } from "@mui/material/colors";
 
 // A custom theme for this app
-export const theme1 = createMuiTheme({
+export const theme1 = createTheme({
   palette: {},
 });
 
-export const theme2 = createMuiTheme({
+export const theme2 = createTheme({
   palette: {
-    type: "dark",
+    // v5 renamed palette.type to mode
+    mode: "dark",
     primary: {
       main: pink["A200"],
       dark: pink["500"],

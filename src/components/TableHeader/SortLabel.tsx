@@ -1,34 +1,24 @@
 import React, { useState } from "react";
-import {
-  ButtonBase,
-  ButtonBaseProps,
-  createStyles,
-  makeStyles,
-} from "@material-ui/core";
-import ArrowDropDown from "@material-ui/icons/ArrowDropDown";
-import ArrowDropUp from "@material-ui/icons/ArrowDropUp";
+import { ButtonBase, ButtonBaseProps } from "@mui/material";
+import ArrowDropDown from "@mui/icons-material/ArrowDropDown";
+import ArrowDropUp from "@mui/icons-material/ArrowDropUp";
 
-const useStyles = makeStyles((theme) =>
-  createStyles({
-    dropdown: {
-      display: "inline-grid",
-    },
-    sortButton: {
-      fontSize: "inherit",
-      fontFamily: "inherit",
-      "&:focus": {
-        color: theme.palette.text.secondary,
-      },
-    },
-  })
-);
+// v2 (MUI v5): the JSS sheet is gone — the theme-reading :focus rule became `sx` on the
+// ButtonBase; the static dropdown rule became an inline style.
+const dropdownStyle: React.CSSProperties = { display: "inline-grid" };
+const sortButtonSx = {
+  fontSize: "inherit",
+  fontFamily: "inherit",
+  "&:focus": {
+    color: "text.secondary",
+  },
+} as const;
 
 export const SortArrows = (props: {
   active?: boolean;
   direction?: "asc" | "desc";
   innerProps?: any;
 }) => {
-  const classes = useStyles();
   const doubleArrows = (
     <>
       <ArrowDropUp viewBox="1 -9 24 24" color="disabled" />
@@ -36,7 +26,7 @@ export const SortArrows = (props: {
     </>
   );
   return (
-    <div {...props.innerProps} className={classes.dropdown}>
+    <div {...props.innerProps} style={dropdownStyle}>
       {!props.active ? (
         doubleArrows
       ) : props.direction === "asc" ? (
@@ -53,12 +43,11 @@ const SortLabel: React.FC<{
   direction?: "asc" | "desc";
   ButtonProps?: ButtonBaseProps;
 }> = ({ label, active, direction, ButtonProps }) => {
-  const classes = useStyles();
   const [hovered, setHovered] = useState(false);
 
   return (
     <ButtonBase
-      className={classes.sortButton}
+      sx={sortButtonSx}
       style={hovered ? { opacity: ".7" } : undefined}
       onMouseOver={() => setHovered(true)}
       onMouseOut={() => setHovered(false)}
