@@ -33,6 +33,33 @@ Breaking changes in 2.0.0:
 - The current-page number button renders `color="inherit"` (v5 removed `"default"`); visually
   identical to 1.x.
 
+## Packaging (3.1.0)
+
+3.1.0 ships an ES module build in `lib-esm/` alongside the CommonJS build in `lib/`, selected by
+an `exports` map. This is not cosmetic — on 3.0.0, which was CommonJS only, MUI v7 handed the
+library and the app two different `TableCell` functions:
+
+- MUI v7 added an `exports` map that serves a different build per condition — `require` resolves
+  to `@mui/material/<X>/index.js`, everything else to `esm/<X>/index.js`.
+- A CommonJS `mui-rest-list` therefore held MUI's CJS cell while an ESM app held the ESM cell.
+- `AdhocListColumn`'s `renderdata` check compares the returned cell by identity, so a callback
+  returning `AdhocListTableCell` threw at render.
+
+MUI v5 had no `exports` map, so both paths collapsed onto one file and the problem could not
+arise; it is specific to v6/v7.
+
+An `exports` map is a whitelist. The supported entry points are:
+
+| specifier | resolves to |
+| --------- | ----------- |
+| `mui-rest-list` | the package entry |
+| `mui-rest-list/lib/<path>` and `mui-rest-list/lib/<path>.js` | that module |
+| `mui-rest-list/lib/src/components`, `.../Pagination`, `.../states` | those directories' `index` |
+
+Types always come from `lib/` and still resolve under `moduleResolution: "node"`. If you add a
+new directory with an `index` file and expect consumers to deep-import it without `/index`, add
+it to `exports` explicitly — wildcards do not perform directory resolution.
+
 ## CodeSandbox
 https://codesandbox.io/s/mui-rest-list-demo-psk0w
 

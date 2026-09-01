@@ -1,15 +1,19 @@
 {
   "name": "mui-rest-list",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "main": "lib/src/components/index.js",
   "types": "lib/src/components/index.d.ts",
   "files": [
-    "lib"
+    "lib",
+    "lib-esm"
   ],
   "scripts": {
-    "build": "tsc --outDir lib",
+    "build": "npm run build:cjs && npm run build:esm",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "build:cjs": "tsc --outDir lib",
+    "build:esm": "tsc --outDir lib-esm --module esnext --moduleResolution node --declaration false && node scripts/finalizeEsmBuild.cjs",
+    "prepublishOnly": "npm run build"
   },
   "repository": "https://github.com/MishaKanai/mui-rest-list.git",
   "author": "Misha Kanai",
@@ -64,5 +68,45 @@
   "resolutions": {
     "@types/react": "^17.0.83",
     "jackspeak": "2.1.1"
+  },
+  "module": "lib-esm/src/components/index.js",
+  "exports": {
+    ".": {
+      "types": "./lib/src/components/index.d.ts",
+      "import": "./lib-esm/src/components/index.js",
+      "require": "./lib/src/components/index.js",
+      "default": "./lib/src/components/index.js"
+    },
+    "./lib/src/components": {
+      "types": "./lib/src/components/index.d.ts",
+      "import": "./lib-esm/src/components/index.js",
+      "require": "./lib/src/components/index.js",
+      "default": "./lib/src/components/index.js"
+    },
+    "./lib/src/components/Pagination": {
+      "types": "./lib/src/components/Pagination/index.d.ts",
+      "import": "./lib-esm/src/components/Pagination/index.js",
+      "require": "./lib/src/components/Pagination/index.js",
+      "default": "./lib/src/components/Pagination/index.js"
+    },
+    "./lib/src/components/states": {
+      "types": "./lib/src/components/states/index.d.ts",
+      "import": "./lib-esm/src/components/states/index.js",
+      "require": "./lib/src/components/states/index.js",
+      "default": "./lib/src/components/states/index.js"
+    },
+    "./lib/*.js": {
+      "types": "./lib/*.d.ts",
+      "import": "./lib-esm/*.js",
+      "require": "./lib/*.js",
+      "default": "./lib/*.js"
+    },
+    "./lib/*": {
+      "types": "./lib/*.d.ts",
+      "import": "./lib-esm/*.js",
+      "require": "./lib/*.js",
+      "default": "./lib/*.js"
+    },
+    "./package.json": "./package.json"
   }
 }
