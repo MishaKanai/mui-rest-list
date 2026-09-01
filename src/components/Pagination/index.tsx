@@ -8,11 +8,20 @@ import React, {
 } from "react";
 import TablePagination, {
   LabelDisplayedRowsArgs,
+  TablePaginationProps,
 } from "@mui/material/TablePagination";
 import PaginationActions, { PaginationActionsProps } from "./Actions";
 import uniqueId from "lodash.uniqueid";
 import useWidth from "../../util/useWidth";
-import { TablePaginationActionsProps } from "@mui/material/TablePagination/TablePaginationActions";
+
+// The props MUI hands to `ActionsComponent`, derived from TablePaginationProps rather than
+// imported by name. MUI has no single spelling for it: TablePaginationActions lives at
+// "@mui/material/TablePagination/TablePaginationActions" in v5/v6 but at a top-level
+// "@mui/material/TablePaginationActions" in v7, whose `exports` map refuses the old two-level
+// path outright. Deriving it keeps one source that compiles against both.
+type ActionsComponentType = NonNullable<
+  TablePaginationProps["ActionsComponent"]
+>;
 
 const PaginationWithEnd = (props: PaginationActionsProps) => (
   <PaginationActions {...props} />
@@ -126,20 +135,19 @@ const Pagination: FunctionComponent<PaginationProps> = (props) => {
     [beyondMaxExactTotalCount, maxExactTotalCount]
   );
 
-  const PaginationComponent: FunctionComponent<TablePaginationActionsProps> =
-    useMemo(() => {
-      // if we are not on/near the final page, and beyondMaxExactTotalCount, don't show the final pages.
+  const PaginationComponent: ActionsComponentType = useMemo(() => {
+    // if we are not on/near the final page, and beyondMaxExactTotalCount, don't show the final pages.
 
-      if (
-        !beyondMaxExactTotalCount ||
-        page === nbPages - 1 ||
-        page === nbPages - 2 ||
-        page === nbPages - 3
-      ) {
-        return PaginationWithEnd;
-      }
-      return PaginationWithoutEnd;
-    }, [beyondMaxExactTotalCount, page, nbPages]);
+    if (
+      !beyondMaxExactTotalCount ||
+      page === nbPages - 1 ||
+      page === nbPages - 2 ||
+      page === nbPages - 3
+    ) {
+      return PaginationWithEnd;
+    }
+    return PaginationWithoutEnd;
+  }, [beyondMaxExactTotalCount, page, nbPages]);
 
   if (total === 0) {
     return null;
@@ -153,19 +161,21 @@ const Pagination: FunctionComponent<PaginationProps> = (props) => {
       rowsPerPageOptions={emptyArray}
       component="span"
       labelDisplayedRows={labelDisplayedRows}
-      backIconButtonProps={{
-        "aria-label": "previous page",
-      }}
-      nextIconButtonProps={{
-        "aria-label": "next page",
-      }}
-      SelectProps={{
-        onClick: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
+      // v3 (MUI v6/v7): backIconButtonProps / nextIconButtonProps / SelectProps are deprecated
+      // aliases of these slotProps entries (removed in v8). Same rendered output.
+      slotProps={{
+        actions: {
+          previousButton: { "aria-label": "previous page" },
+          nextButton: { "aria-label": "next page" },
         },
-        MenuProps: {
-          style: { zIndex: 100000 },
+        select: {
+          onClick: (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          },
+          MenuProps: {
+            style: { zIndex: 100000 },
+          },
         },
       }}
     />
@@ -186,18 +196,22 @@ const Pagination: FunctionComponent<PaginationProps> = (props) => {
       }
       labelDisplayedRows={labelDisplayedRows}
       rowsPerPageOptions={rowsPerPageOptions}
-      SelectProps={{
-        onClick: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
+      // v3 (MUI v6/v7): SelectProps is a deprecated alias of slotProps.select (removed in v8).
+      // The public `SelectProps` prop of this component is unchanged and still lands here.
+      slotProps={{
+        select: {
+          onClick: (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          },
+          MenuProps: {
+            style: { zIndex: 100000 },
+          },
+          SelectDisplayProps: {
+            "aria-describedby": mediumRPPLabelId.current,
+          },
+          ...props.SelectProps,
         },
-        MenuProps: {
-          style: { zIndex: 100000 },
-        },
-        SelectDisplayProps: {
-          "aria-describedby": mediumRPPLabelId.current,
-        },
-        ...props.SelectProps,
       }}
     />
   );

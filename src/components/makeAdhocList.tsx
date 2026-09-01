@@ -213,11 +213,11 @@ const makeAdhocList = <DataShape extends {}>() => {
       if (resultElement.type !== TableCell) {
         throw new Error(
           `render prop on AdhocListColumn must return a <TableCell> element.
-          As of mui-rest-list 2.x that means @mui/material's TableCell (v5) — the same module
-          instance this library resolves through its peer dependency. If your bundler or package
-          manager might duplicate @mui/material, import the cell from this library instead:
+          As of mui-rest-list 3.x that means @mui/material's TableCell (v6 or v7) — the same
+          module instance this library resolves through its peer dependency. If your bundler or
+          package manager might duplicate @mui/material, import the cell from this library instead:
           import { AdhocListTableCell } from "mui-rest-list".
-          (On mui-rest-list 1.x, return @material-ui/core's v4 TableCell.)`
+          (mui-rest-list 2.x expects @mui/material v5's cell; 1.x, @material-ui/core's v4 cell.)`
         );
       }
       return resultElement;
