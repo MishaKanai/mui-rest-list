@@ -37,21 +37,42 @@ export const SortArrows = (props: {
     </div>
   );
 };
-const SortLabel: React.FC<{
+type SortLabelOwnProps = {
   label: React.ReactNode;
   active?: boolean;
   direction?: "asc" | "desc";
   ButtonProps?: ButtonBaseProps;
-}> = ({ label, active, direction, ButtonProps }) => {
+};
+
+// forwardRef, and pass the leftover props through, so this can be a <Tooltip> child.
+// Tooltip clones its child with a ref plus the handlers that open the tooltip; a plain
+// function component holds neither, so the "Sort" tooltip never opened and React logged
+// "Function components cannot be given refs" for every sortable column on every render.
+const SortLabel = React.forwardRef<
+  HTMLButtonElement,
+  SortLabelOwnProps & Omit<ButtonBaseProps, keyof SortLabelOwnProps>
+>(function SortLabel({ label, active, direction, ButtonProps, ...rest }, ref) {
   const [hovered, setHovered] = useState(false);
+  // `rest` is what Tooltip cloned on (className, style, aria-describedby, its hover/focus
+  // handlers). ButtonProps still wins over it, as it did before.
+  const buttonProps: ButtonBaseProps = { ...rest, ...ButtonProps };
 
   return (
     <ButtonBase
+      ref={ref}
       sx={sortButtonSx}
-      style={hovered ? { opacity: ".7" } : undefined}
-      onMouseOver={() => setHovered(true)}
-      onMouseOut={() => setHovered(false)}
-      {...ButtonProps}
+      {...buttonProps}
+      style={
+        hovered ? { opacity: ".7", ...buttonProps.style } : buttonProps.style
+      }
+      onMouseOver={(e) => {
+        buttonProps.onMouseOver?.(e);
+        setHovered(true);
+      }}
+      onMouseOut={(e) => {
+        buttonProps.onMouseOut?.(e);
+        setHovered(false);
+      }}
     >
       <b>{label}</b>
       <span style={{ position: "relative", paddingRight: "2rem" }}>
@@ -72,5 +93,5 @@ const SortLabel: React.FC<{
       </span>
     </ButtonBase>
   );
-};
+});
 export default SortLabel;
