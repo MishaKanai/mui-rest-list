@@ -1,3 +1,8 @@
 node_modules
 storybook-static
 .DS_Store
+
+# build output — this package ships via npm (see package.json "files"/"exports"),
+# so lib/ and lib-esm/ are produced at publish time and must never be committed.
+lib
+lib-esm
