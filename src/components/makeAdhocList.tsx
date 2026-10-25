@@ -522,7 +522,9 @@ const makeAdhocList = <DataShape extends {}>() => {
                           }
                           // align={field.props.cellAlign}
                         >
-                          <Tooltip title="Sort" enterDelay={300}>
+                          {/* describeChild makes "Sort" the button's description, not its name. As the name,
+                              it replaced the visible column title (WCAG 2.5.3 Label in Name). */}
+                          <Tooltip title="Sort" describeChild enterDelay={300}>
                             <SortLabel
                               ButtonProps={{
                                 onClick: (e) => {
